@@ -1,0 +1,7 @@
+http://jo0ls-dotnet-stuff.blogspot.be/2011/09/reading-cd-text-with-vbnet-1.html?m=1
+http://jo0ls-dotnet-stuff.blogspot.be/2011/09/reading-cd-text-with-vbnet-2.html?m=1
+http://jo0ls-dotnet-stuff.blogspot.be/2011/10/reading-cd-text-with-vbnet-3.html?m=1
+
+http://www.codeproject.com/Articles/5458/C-Sharp-Ripper
+http://www.codeproject.com/Articles/5901/C-MP3-Compressor
+http://www.codeproject.com/Articles/7389/Retrieving-CD-Information-from-a-remote-Freedb-dat
