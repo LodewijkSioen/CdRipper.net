@@ -2,6 +2,9 @@
 
 namespace CdRipper.Rip
 {
+    public delegate void OnReadingTrack(byte[] buffer);
+    public delegate void OnTrackReadingProgress(uint bytesRead, uint totalBytes);
+
     public class TrackReader : IDisposable
     {
         private CdDrive _drive;
@@ -13,7 +16,7 @@ namespace CdRipper.Rip
             _isLocked = drive.Lock();
         }
 
-        public void ReadTrack(Track track, Action<byte[]> onDataRead, Action<uint, uint> onProgress)
+        public void ReadTrack(Track track, OnReadingTrack onDataRead, OnTrackReadingProgress onProgress)
         {
             var bytes2Read = (uint)(track.EndSector - track.StartSector) * Constants.CB_AUDIO;
             var bytesRead = (uint)0;
