@@ -3,6 +3,7 @@ using CdRipper.Encode;
 using CdRipper.Rip;
 using System;
 using System.IO;
+using System.Linq;
 
 namespace CdRipper.TestConsole
 {
@@ -41,7 +42,7 @@ namespace CdRipper.TestConsole
                                 OutputFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), @"encoding\test.mp3")
                             }))
                             {
-                                trackReader.ReadTrack(toc.Tracks[trackNumber],
+                                trackReader.ReadTrack(toc.Tracks.First(t => t.TrackNumber == trackNumber),
                                     b =>
                                     {
                                         encoder.Write(b);
