@@ -1,4 +1,8 @@
-﻿using System;
+﻿using CdRipper.CdDb;
+using CdRipper.Encode;
+using CdRipper.Rip;
+using System;
+using System.IO;
 
 namespace CdRipper.TestConsole
 {
@@ -23,7 +27,7 @@ namespace CdRipper.TestConsole
 
                         var toc = drive.ReadTableOfContents();
                         Console.WriteLine("number of tracks:" + toc.Tracks.Count);
-                        Console.WriteLine("CDDB id:" + CdRipper.DiscIdCalculator.CalculateDiscId(toc));
+                        Console.WriteLine("CDDB id:" + DiscIdCalculator.CalculateDiscId(toc));
                         foreach (var track in toc.Tracks)
                         {
                             Console.WriteLine("track {0}: lenth={1}-{2}", track.TrackNumber, track.StartSector, track.EndSector);
@@ -31,11 +35,22 @@ namespace CdRipper.TestConsole
                         Console.WriteLine("Enter tracknumber to rip");
                         var trackNumber = Convert.ToInt32(Console.ReadLine());
                         using (var trackReader = new TrackReader(drive))
-                        {                            
-                            trackReader.ReadTrack(toc.Tracks[trackNumber], b => { }, (i, a) =>
+                        {
+                            using (var encoder = new LameMp3Encoder(new EncoderSettings
                             {
-                                Console.WriteLine("{0} of {1} read", i, a);
-                            });
+                                OutputFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), @"encoding\test.mp3")
+                            }))
+                            {
+                                trackReader.ReadTrack(toc.Tracks[trackNumber],
+                                    b =>
+                                    {
+                                        encoder.Write(b);
+                                    },
+                                    (i, a) =>
+                                    {
+                                        Console.WriteLine("{0} of {1} read", i, a);
+                                    });
+                            }
                         }
                     }
                 }

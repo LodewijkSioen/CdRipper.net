@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using NUnit.Framework;
+using CdRipper.CdDb;
+using CdRipper.Rip;
 
 namespace CdRipper.Tests
 {

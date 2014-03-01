@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CdRipper
+namespace CdRipper.Rip
 {
     public class TrackReader : IDisposable
     {

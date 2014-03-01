@@ -1,4 +1,5 @@
-﻿namespace CdRipper
+﻿using CdRipper.Rip;
+namespace CdRipper.CdDb
 {
     public static class DiscIdCalculator
     {

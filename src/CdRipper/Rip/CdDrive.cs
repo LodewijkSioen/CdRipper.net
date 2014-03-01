@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace CdRipper
+namespace CdRipper.Rip
 {
     public class CdDrive : IDisposable
     {

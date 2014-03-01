@@ -39,14 +39,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CDDBCalculator.cs" />
-    <Compile Include="CdDrive.cs" />
-    <Compile Include="Constants.cs" />
+    <Compile Include="CdDb\CDDBCalculator.cs" />
+    <Compile Include="Encode\LameMp3Encoder.cs" />
+    <Compile Include="Rip\CdDrive.cs" />
+    <Compile Include="Rip\Constants.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TableOfContents.cs" />
-    <Compile Include="Track.cs" />
-    <Compile Include="TrackReader.cs" />
+    <Compile Include="Rip\TableOfContents.cs" />
+    <Compile Include="Rip\Track.cs" />
+    <Compile Include="Rip\TrackReader.cs" />
     <Compile Include="Win32Functions.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\..\Binaries\lame\lame.exe">
+      <Link>lame.exe</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

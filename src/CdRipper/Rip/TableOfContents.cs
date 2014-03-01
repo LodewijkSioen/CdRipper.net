@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CdRipper
+namespace CdRipper.Rip
 {
     public class TableOfContents
     {

@@ -1,4 +1,4 @@
-﻿namespace CdRipper
+﻿namespace CdRipper.Rip
 {
     public static class Constants
     {
