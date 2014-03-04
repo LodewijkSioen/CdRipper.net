@@ -10,6 +10,12 @@ namespace CdRipper.Rip
         private CdDrive _drive;
         private bool _isLocked;
 
+        public TrackReader(string driveName)
+        {
+            _drive = new CdDrive(driveName);
+            _isLocked = _drive.Lock();
+        }
+
         public TrackReader(CdDrive drive)
         {
             _drive = drive;
@@ -18,7 +24,12 @@ namespace CdRipper.Rip
 
         public void ReadTrack(Track track, OnReadingTrack onDataRead, OnTrackReadingProgress onProgress)
         {
-            var bytes2Read = (uint)(track.EndSector - track.StartSector) * Constants.CB_AUDIO;
+            ReadTrack(track.StartSector, track.EndSector, onDataRead, onProgress);
+        }
+
+        public void ReadTrack(int startSector, int endSector, OnReadingTrack onDataRead, OnTrackReadingProgress onProgress)
+        {
+            var bytes2Read = (uint)(endSector - startSector) * Constants.CB_AUDIO;
             var bytesRead = (uint)0;
 
             if (onProgress != null)
@@ -26,9 +37,9 @@ namespace CdRipper.Rip
                 onProgress(bytesRead, bytes2Read);
             }
 
-            for (int sector = track.StartSector; (sector < track.EndSector); sector += Constants.NSECTORS)
+            for (int sector = startSector; (sector < endSector); sector += Constants.NSECTORS)
             {
-                var sectors2Read = ((sector + Constants.NSECTORS) < track.EndSector) ? Constants.NSECTORS : (track.EndSector - sector);
+                var sectors2Read = ((sector + Constants.NSECTORS) < endSector) ? Constants.NSECTORS : (endSector - sector);
                 var buffer = _drive.ReadSector(sector, sectors2Read);
                 
                 onDataRead(buffer);
@@ -45,7 +56,7 @@ namespace CdRipper.Rip
         {
             if (_isLocked)
             {
-                _drive.UnLock();
+                _isLocked = !_drive.UnLock();
             }
             _drive = null;
         }
