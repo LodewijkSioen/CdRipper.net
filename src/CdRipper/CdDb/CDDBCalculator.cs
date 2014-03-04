@@ -15,8 +15,8 @@ namespace CdRipper.CdDb
 
             foreach (var track in toc.Tracks)
             {
-                totalLength += (int) track.Length.TotalSeconds + 150; //Without the 2s lead-in 
-                starttimes += SumOfDigits((track.StartSector/75) +150);
+                totalLength += (int) track.Length.TotalSeconds;
+                starttimes += SumOfDigits(((track.StartSector+150)/75));//2 second lead-in
             }
 
             var checkSumStartTimes = starttimes % 255;

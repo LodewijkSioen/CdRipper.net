@@ -60,18 +60,18 @@ namespace CdRipper.Tests
             return new TableOfContents(new List<Track>
             {
                 //TODO: -150
-                new Track(1, 150, 14671),
-                new Track(2, 14672, 27366),
-                new Track(3, 27367, 45029),
-                new Track(4, 45030, 60544),
-                new Track(5, 60545, 76706),
-                new Track(6, 76707, 103644),
-                new Track(7, 103645, 116429),
-                new Track(8, 116430, 137729),
-                new Track(9, 137730, 156886),
-                new Track(10, 156887, 171576),
-                new Track(11, 171577, 185791),
-                new Track(12, 185792, 208499)
+                new Track(1, 150-150, 14671-150),
+                new Track(2, 14672-150, 27366-150),
+                new Track(3, 27367-150, 45029-150),
+                new Track(4, 45030-150, 60544-150),
+                new Track(5, 60545-150, 76706-150),
+                new Track(6, 76707-150, 103644-150),
+                new Track(7, 103645-150, 116429-150),
+                new Track(8, 116430-150, 137729-150),
+                new Track(9, 137730-150, 156886-150),
+                new Track(10, 156887-150, 171576-150),
+                new Track(11, 171577-150, 185791-150),
+                new Track(12, 185792-150, 208499-150)
             });
         }
 
