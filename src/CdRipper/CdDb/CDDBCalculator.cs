@@ -1,7 +1,9 @@
 ﻿using CdRipper.Rip;
+using System.Linq;
+
 namespace CdRipper.CdDb
-{
-    public static class DiscIdCalculator
+{   
+    public static class FreeDbDiscIdCalculator
     {
         //http://en.wikipedia.org/wiki/CDDB
         //http://introcs.cs.princeton.edu/java/51data/CDDB.java.html
@@ -13,8 +15,8 @@ namespace CdRipper.CdDb
 
             foreach (var track in toc.Tracks)
             {
-                totalLength += (int) track.Length.TotalSeconds;
-                starttimes += SumOfDigits(track.StartSector/75);
+                totalLength += (int) track.Length.TotalSeconds + 150; //Without the 2s lead-in 
+                starttimes += SumOfDigits((track.StartSector/75) +150);
             }
 
             var checkSumStartTimes = starttimes % 255;

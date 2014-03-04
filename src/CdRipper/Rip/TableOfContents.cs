@@ -19,8 +19,8 @@ namespace CdRipper.Rip
             {
                 if (toc.TrackData[i].Control == 0)
                 {
-                    var start = GetStartSector(toc.TrackData[i]);
-                    var end = GetStartSector(toc.TrackData[i + 1]) - 1;
+                    var start = GetStartSector(toc.TrackData[i]) - 150; //With the two seconds lead-in for reading the track
+                    var end = GetStartSector(toc.TrackData[i + 1]) - 151;
 
                     yield return new Track(toc.TrackData[i].TrackNumber, start, end);    
                 }

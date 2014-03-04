@@ -26,8 +26,7 @@ namespace CdRipper.Rip
                 onProgress(bytesRead, bytes2Read);
             }
 
-            //TODO: This 150 (2s) is a bit wierd...(
-            for (int sector = track.StartSector - 150; (sector < track.EndSector - 150); sector += Constants.NSECTORS)
+            for (int sector = track.StartSector; (sector < track.EndSector); sector += Constants.NSECTORS)
             {
                 var sectors2Read = ((sector + Constants.NSECTORS) < track.EndSector) ? Constants.NSECTORS : (track.EndSector - sector);
                 var buffer = _drive.ReadSector(sector, sectors2Read);

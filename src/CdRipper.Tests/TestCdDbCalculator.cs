@@ -12,7 +12,7 @@ namespace CdRipper.Tests
         [TestCaseSource("GetTestCds")]
         public string TestCalculationOfDiscId(TableOfContents toc)
         {
-            return DiscIdCalculator.CalculateDiscId(toc);
+            return FreeDbDiscIdCalculator.CalculateDiscId(toc);
         }
 
         public IEnumerable<TestCaseData> GetTestCds()
@@ -59,6 +59,7 @@ namespace CdRipper.Tests
         {
             return new TableOfContents(new List<Track>
             {
+                //TODO: -150
                 new Track(1, 150, 14671),
                 new Track(2, 14672, 27366),
                 new Track(3, 27367, 45029),
@@ -78,26 +79,26 @@ namespace CdRipper.Tests
         {
             return new TableOfContents(new List<Track>
             {
-                new Track(1, 0+150, 12835+150),
-                new Track(2, 12836+150, 25108+150),
-                new Track(3, 25109+150, 37840+150),
-                new Track(4, 37841+150, 49193+150),
-                new Track(5, 49194+150, 61342+150),
-                new Track(6, 61343+150, 73837+150),
-                new Track(7, 73838+150, 86323+150),
-                new Track(8, 86324+150, 99086+150),
-                new Track(9, 99087+150, 111527+150),
-                new Track(10, 111528+150, 124946+150),
-                new Track(11, 124947+150, 137790+150),
-                new Track(12, 137791+150, 150074+150),
-                new Track(13, 150075+150, 162840+150),
-                new Track(14, 162841+150, 174174+150),
-                new Track(15, 174175+150, 186361+150),
-                new Track(16, 186362+150, 198830+150),
-                new Track(17, 198831+150, 211316+150),
-                new Track(18, 211317+150, 224116+150),
-                new Track(19, 224117+150, 236562+150),
-                new Track(20, 236563+150, 249913+150)
+                new Track(1, 0, 12835),
+                new Track(2, 12836, 25108),
+                new Track(3, 25109, 37840),
+                new Track(4, 37841, 49193),
+                new Track(5, 49194, 61342),
+                new Track(6, 61343, 73837),
+                new Track(7, 73838, 86323),
+                new Track(8, 86324, 99086),
+                new Track(9, 99087, 111527),
+                new Track(10, 111528, 124946),
+                new Track(11, 124947, 137790),
+                new Track(12, 137791, 150074),
+                new Track(13, 150075, 162840),
+                new Track(14, 162841, 174174),
+                new Track(15, 174175, 186361),
+                new Track(16, 186362, 198830),
+                new Track(17, 198831, 211316),
+                new Track(18, 211317, 224116),
+                new Track(19, 224117, 236562),
+                new Track(20, 236563, 249913)
             });
         }
 
@@ -105,6 +106,7 @@ namespace CdRipper.Tests
         {
             return new TableOfContents(new List<Track>
             {       
+                //TODO: -150
                 new Track(1, 150, 12920),
                 new Track(2, 12921, 24318),
                 new Track(3, 24319, 34861),

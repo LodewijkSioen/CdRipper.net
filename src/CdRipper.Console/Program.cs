@@ -28,7 +28,7 @@ namespace CdRipper.TestConsole
 
                         var toc = drive.ReadTableOfContents();
                         Console.WriteLine("number of tracks:" + toc.Tracks.Count);
-                        Console.WriteLine("CDDB id:" + DiscIdCalculator.CalculateDiscId(toc));
+                        Console.WriteLine("CDDB id:" + FreeDbDiscIdCalculator.CalculateDiscId(toc));
                         foreach (var track in toc.Tracks)
                         {
                             Console.WriteLine("track {0}: lenth={1}-{2}", track.TrackNumber, track.StartSector, track.EndSector);
@@ -39,7 +39,7 @@ namespace CdRipper.TestConsole
                         {
                             using (var encoder = new LameMp3Encoder(new EncoderSettings
                             {
-                                OutputFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), @"encoding\test.mp3")
+                                OutputFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), String.Format(@"encoding\track{0:##}.mp3", trackNumber))
                             }))
                             {
                                 trackReader.ReadTrack(toc.Tracks.First(t => t.TrackNumber == trackNumber),
