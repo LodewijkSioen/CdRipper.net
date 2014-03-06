@@ -1,8 +1,9 @@
-﻿using CdRipper.Rip;
-using System.Linq;
+﻿using System;
+using CdRipper.Rip;
 
-namespace CdRipper.CdDb
-{   
+namespace CdRipper.Tagging
+{
+    [Obsolete("This is still buggy")]
     public static class FreeDbDiscIdCalculator
     {
         //http://en.wikipedia.org/wiki/CDDB
@@ -15,8 +16,8 @@ namespace CdRipper.CdDb
 
             foreach (var track in toc.Tracks)
             {
-                totalLength += (int) track.Length.TotalSeconds;
-                starttimes += SumOfDigits(((track.StartSector+150)/75));//2 second lead-in
+                totalLength += (int)Math.Floor(track.Length.TotalSeconds);
+                starttimes += SumOfDigits(track.Offset/75);
             }
 
             var checkSumStartTimes = starttimes % 255;
@@ -24,7 +25,7 @@ namespace CdRipper.CdDb
             return string.Format("{0}{1}{2}",
                 checkSumStartTimes.ToString("X").PadLeft(2, '0'),
                 totalLength.ToString("X").PadLeft(4, '0'),
-                numberOfTracks.ToString("X").PadLeft(2, '0'));
+                numberOfTracks.ToString("X").PadLeft(2, '0')).ToLowerInvariant();
         }
 
         private static int SumOfDigits(int number)

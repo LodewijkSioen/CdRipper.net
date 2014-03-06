@@ -39,7 +39,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CdDb\CDDBCalculator.cs" />
+    <Compile Include="Tagging\MusicBrainzDiscIdCalculator.cs" />
+    <Compile Include="Tagging\FreeDbDiscIdCalculator.cs" />
     <Compile Include="Encode\LameMp3Encoder.cs" />
     <Compile Include="Rip\CdDrive.cs" />
     <Compile Include="Rip\Constants.cs" />

@@ -24,12 +24,12 @@ namespace CdRipper.Rip
 
         public void ReadTrack(Track track, OnReadingTrack onDataRead, OnTrackReadingProgress onProgress)
         {
-            ReadTrack(track.StartSector, track.EndSector, onDataRead, onProgress);
+            ReadTrack(track.Offset, track.Sectors, onDataRead, onProgress);
         }
 
-        public void ReadTrack(int startSector, int endSector, OnReadingTrack onDataRead, OnTrackReadingProgress onProgress)
+        public void ReadTrack(int offset, int sectors, OnReadingTrack onDataRead, OnTrackReadingProgress onProgress)
         {
-            var bytes2Read = (uint)(endSector - startSector) * Constants.CB_AUDIO;
+            var bytes2Read = (uint)(sectors) * Constants.CB_AUDIO;
             var bytesRead = (uint)0;
 
             if (onProgress != null)
@@ -37,10 +37,10 @@ namespace CdRipper.Rip
                 onProgress(bytesRead, bytes2Read);
             }
 
-            for (int sector = startSector; (sector < endSector); sector += Constants.NSECTORS)
+            for (int sector = 0; (sector < sectors); sector += Constants.NSECTORS)
             {
-                var sectors2Read = ((sector + Constants.NSECTORS) < endSector) ? Constants.NSECTORS : (endSector - sector);
-                var buffer = _drive.ReadSector(sector, sectors2Read);
+                var sectors2Read = ((sector + Constants.NSECTORS) < sectors) ? Constants.NSECTORS : (sectors - sector);
+                var buffer = _drive.ReadSector(offset - 150 + sector, sectors2Read);//No 2 second lead in for reading the track
                 
                 onDataRead(buffer);
                 bytesRead += (uint)(Constants.CB_AUDIO * sectors2Read);
