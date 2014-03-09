@@ -30,6 +30,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.6.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -39,6 +42,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Tagging\IIMusicBrainzApi.cs" />
+    <Compile Include="Tagging\MusicBrainzApi.cs" />
     <Compile Include="Tagging\MusicBrainzDiscIdCalculator.cs" />
     <Compile Include="Tagging\FreeDbDiscIdCalculator.cs" />
     <Compile Include="Encode\LameMp3Encoder.cs" />
@@ -48,6 +53,7 @@
     <Compile Include="Rip\TableOfContents.cs" />
     <Compile Include="Rip\Track.cs" />
     <Compile Include="Rip\TrackReader.cs" />
+    <Compile Include="Tagging\MusicBrainzTagSource.cs" />
     <Compile Include="Win32Functions.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -55,6 +61,9 @@
       <Link>lame.exe</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

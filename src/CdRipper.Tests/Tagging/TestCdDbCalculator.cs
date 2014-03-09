@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
+using CdRipper.Rip;
 using CdRipper.Tagging;
 using NUnit.Framework;
-using CdRipper.Rip;
 
-namespace CdRipper.Tests
+namespace CdRipper.Tests.Tagging
 {
     [TestFixture]
     public class TestCdDbCalculator
@@ -22,7 +22,7 @@ namespace CdRipper.Tests
 
             yield return new TestCaseData(DummyData.GetTableOfContentsForSteekJeVingerInDeLucht())
                 .SetName("Steek je vinger in de lucht")
-                .Returns("xvIXvh0ibMHH1NNGkT_txTh.2f4-");
+                .Returns(DummyData.MusicBrainzDiscIdSteekJeVingerInDeLucht);
         }
 
         [TestCaseSource("GetTestCdDb"), Explicit("Still Failing")]

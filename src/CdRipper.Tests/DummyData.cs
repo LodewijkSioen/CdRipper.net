@@ -53,5 +53,6 @@ namespace CdRipper.Tests
             });
         }
 
+        public static string MusicBrainzDiscIdSteekJeVingerInDeLucht { get {return "xvIXvh0ibMHH1NNGkT_txTh.2f4-";} }
     }
 }

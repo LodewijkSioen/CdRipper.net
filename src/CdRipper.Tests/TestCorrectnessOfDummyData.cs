@@ -1,14 +1,11 @@
 using System;
-using System.Linq;
 using CdRipper.Rip;
-using CdRipper.Tagging;
-using DiscId;
 using NUnit.Framework;
 
 namespace CdRipper.Tests
 {
     [TestFixture]
-    public class TestFixtureDummyData
+    public class TestCorrectnessOfDummyData
     {
         [Test, Explicit]
         public void TestDummyData()
@@ -30,31 +27,6 @@ namespace CdRipper.Tests
                     Assert.That(realTrack.Length, Is.EqualTo(dummyTrack.Length), "length " + i);
                 }
             }
-        }
-
-        [Test, Explicit]
-        public void CompareNativeImplWithLibDiscId()
-        {
-            TableOfContents toc;
-
-            using (var nativeDrive = new CdDrive("f"))
-            {
-                toc = nativeDrive.ReadTableOfContents();
-            }
-            using (var libDrive = Disc.Read("f:"))
-            {
-                Assert.That(toc.Tracks.Count, Is.EqualTo(libDrive.Tracks.Count()));
-                Assert.That(FreeDbDiscIdCalculator.CalculateDiscId(toc), Is.EqualTo(libDrive.FreedbId));
-
-                foreach (var track in toc.Tracks)
-                {
-                    var libTrack = libDrive.Tracks.Single(l => l.Number == track.TrackNumber);
-                    Assert.That(track.Offset, Is.EqualTo(libTrack.Offset), "Startsector of track" + track.TrackNumber);
-                    Assert.That(track.Sectors, Is.EqualTo(libTrack.Sectors));
-                    Assert.That(track.Sectors, Is.EqualTo(libTrack.Sectors), "EndSector of track " + track.TrackNumber);
-                }
-            }
-
         }
 
         [Test, Explicit]

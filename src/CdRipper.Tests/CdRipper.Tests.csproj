@@ -44,9 +44,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DummyData.cs" />
-    <Compile Include="TestCdDbCalculator.cs" />
+    <Compile Include="Tagging\TestCdDbCalculator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestFixtureDummyData.cs" />
+    <Compile Include="Tagging\TestTagRetrieval.cs" />
+    <Compile Include="TestCorrectnessOfDummyData.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CdRipper\CdRipper.csproj">
