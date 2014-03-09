@@ -8,6 +8,8 @@ namespace CdRipper.TestConsole
 {
     class Program
     {
+       static MusicBrainzTagSource _tagSource = new MusicBrainzTagSource(new MusicBrainzApi("http://musicbrainz.org/"));
+
 
         static void Main(string[] args)
         {
@@ -32,13 +34,15 @@ namespace CdRipper.TestConsole
             using (var drive = new CdDrive(driveletter))
             {
                 var toc = drive.ReadTableOfContents();
+                var discTag = _tagSource.GetTags(MusicBrainzDiscIdCalculator.CalculateDiscId(toc)).ToList();
 
                 Console.WriteLine("number of tracks:" + toc.Tracks.Count());
-                Console.WriteLine("CDDB id:" + FreeDbDiscIdCalculator.CalculateDiscId(toc));
                 Console.WriteLine("MusicBrainz id:" + MusicBrainzDiscIdCalculator.CalculateDiscId(toc));
+                Console.WriteLine("{0} - {1}", discTag[0].Artist, discTag[0].Title);
+
                 foreach (var track in toc.Tracks)
                 {
-                    Console.WriteLine("track {0}: lenth={1}-{2}", track.TrackNumber, track.Offset, track.Offset + track.Sectors);
+                    Console.WriteLine("track {0}: {1} (lenth={2}-{3})", track.TrackNumber, discTag[0].Songs.First(s => s.TrackNumber == track.TrackNumber).Title, track.Offset, track.Offset + track.Sectors);
                 }
 
                 Console.WriteLine("Enter tracknumber to rip");
@@ -49,7 +53,8 @@ namespace CdRipper.TestConsole
                     var output=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), String.Format(@"encoding\track{0:00}.mp3", trackNumber));
                     using (var encoder = new LameMp3Encoder(new EncoderSettings
                     {
-                        OutputFile = output
+                        OutputFile = output,
+                        Song = discTag[0].Songs.First(s => s.TrackNumber == trackNumber)
                     }))
                     {
                         var track = toc.Tracks.First(t => t.TrackNumber == trackNumber);

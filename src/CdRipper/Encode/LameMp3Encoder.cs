@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using CdRipper.Tagging;
 
 namespace CdRipper.Encode
 {
     public class EncoderSettings
     {
         public string OutputFile { get; set; }
-        public Id3TagInfo TagInfo { get; set; }
+        public SongTag Song { get; set; }
         public Mp3Settings Mp3Settings { get; set; } 
     }
 
@@ -20,32 +16,31 @@ namespace CdRipper.Encode
 
     public class LameMp3Encoder : IDisposable
     {
-        private Process Lame;
+        private Process _lame;
 
         public LameMp3Encoder(EncoderSettings settings)
-        {
-            string outputFileName = settings.OutputFile;
-            Lame = new Process();
-            Lame.StartInfo.FileName = @"lame.exe";
-            Lame.StartInfo.UseShellExecute = false;
-            Lame.StartInfo.RedirectStandardInput = true;
-            Lame.StartInfo.Arguments = "-r -m s - \"" + outputFileName + "\"";
-            Lame.StartInfo.CreateNoWindow = true;
-            Lame.Start();            
+        {   
+            _lame = new Process();
+            _lame.StartInfo.FileName = @"lame.exe";
+            _lame.StartInfo.UseShellExecute = false;
+            _lame.StartInfo.RedirectStandardInput = true;
+            _lame.StartInfo.Arguments = String.Format("-r -m s --tt \"{0}\" --ta \"{1}\" --tl \"{2}\" --tn \"{3}/{4}\" - \"{5}\"", settings.Song.Title, settings.Song.Artist, settings.Song.Disc.Title, settings.Song.TrackNumber, settings.Song.Disc.NumberOfTracks, settings.OutputFile);
+            _lame.StartInfo.CreateNoWindow = true;
+            _lame.Start();            
         }
 
         public void Write(byte[] buffer)
         {
-            Lame.StandardInput.BaseStream.Write(buffer, 0, buffer.Length);
+            _lame.StandardInput.BaseStream.Write(buffer, 0, buffer.Length);
         }
 
         public void Dispose()
         {
-            if (Lame != null)
+            if (_lame != null)
             {
-                Lame.StandardInput.Close();
-                Lame.Dispose();
-                Lame = null;
+                _lame.StandardInput.Close();
+                _lame.Dispose();
+                _lame = null;
             }
         }
     }

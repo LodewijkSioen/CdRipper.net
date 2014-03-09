@@ -25,17 +25,22 @@ namespace CdRipper.Tagging
                 var releaseJson = _api.GetRelease((string)r["id"]);
                 var release = JObject.Parse(releaseJson);
                 var disc = release["media"].First(m => m["discs"].Any(d => (string)d["id"] == discId));
-                yield return  new DiscTag
+                var tag = new DiscTag
                    {
                        Artist = (string)release["artist-credit"][0]["name"],
                        Title = (string)release["title"],
-                       Songs = from t in disc["tracks"]
-                               select new SongTag
-                               {
-                                   Title = (string)t["title"],
-                                   Artist = (string)t["artist-credit"][0]["name"]
-                               }
+                       NumberOfTracks = (int)disc["track-count"]
                    };
+                tag.Songs = from t in disc["tracks"]
+                    select new SongTag
+                    {
+                        Title = (string) t["title"],
+                        Artist = (string) t["artist-credit"][0]["name"],
+                        TrackNumber = (int) t["number"],
+                        Disc = tag
+                    };
+
+                yield return tag;
             }
         }
     }
@@ -45,11 +50,14 @@ namespace CdRipper.Tagging
         public string Artist { get; set; }
         public string Title { get; set; }
         public IEnumerable<SongTag>  Songs { get; set; }
+        public int NumberOfTracks { get; set; }
     }
 
     public class SongTag
     {
         public string Artist { get; set; }
         public string Title { get; set; }
+        public int TrackNumber { get; set; }
+        public DiscTag Disc { get; set; }
     }
 }
