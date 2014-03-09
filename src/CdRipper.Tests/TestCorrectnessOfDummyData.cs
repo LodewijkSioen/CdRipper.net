@@ -10,7 +10,7 @@ namespace CdRipper.Tests
         [Test, Explicit]
         public void TestDummyData()
         {
-            var dummyToc = DummyData.GetTableOfContentsForSteekJeVingerInDeLucht();
+            var dummyToc = DummyData.SteekJeVingerInDeLucht.GetTableOfContents();
 
             using (var drive = new CdDrive("f"))
             {

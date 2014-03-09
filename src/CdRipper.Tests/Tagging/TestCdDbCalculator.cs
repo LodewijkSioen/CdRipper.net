@@ -16,13 +16,13 @@ namespace CdRipper.Tests.Tagging
 
         public IEnumerable<TestCaseData> GetTestMusicBrainz()
         {
-            yield return new TestCaseData(DummyData.GetTableOfContentsForJuniorEuroSong2011())
+            yield return new TestCaseData(DummyData.JuniorEuroSong2011.GetTableOfContents())
                 .SetName("Junior Eurosong 2011")
-                .Returns("WMnoPf6.FF0PALnVth5jCRT1LxI-");
+                .Returns(DummyData.JuniorEuroSong2011.MusicBrainzDiscId);
 
-            yield return new TestCaseData(DummyData.GetTableOfContentsForSteekJeVingerInDeLucht())
+            yield return new TestCaseData(DummyData.SteekJeVingerInDeLucht.GetTableOfContents())
                 .SetName("Steek je vinger in de lucht")
-                .Returns(DummyData.MusicBrainzDiscIdSteekJeVingerInDeLucht);
+                .Returns(DummyData.SteekJeVingerInDeLucht.MusicBrainzDiscId);
         }
 
         [TestCaseSource("GetTestCdDb"), Explicit("Still Failing")]
@@ -33,13 +33,13 @@ namespace CdRipper.Tests.Tagging
 
         public IEnumerable<TestCaseData> GetTestCdDb()
         {
-            yield return new TestCaseData(DummyData.GetTableOfContentsForJuniorEuroSong2011())
+            yield return new TestCaseData(DummyData.JuniorEuroSong2011.GetTableOfContents())
                 .SetName("Junior Eurosong 2011")
-                .Returns("290d0414");
+                .Returns(DummyData.JuniorEuroSong2011.CdDcDiscId);
 
-            yield return new TestCaseData(DummyData.GetTableOfContentsForSteekJeVingerInDeLucht())
+            yield return new TestCaseData(DummyData.SteekJeVingerInDeLucht.GetTableOfContents())
                 .SetName("Steek je vinger in de lucht")
-                .Returns("c708b90e");
+                .Returns(DummyData.SteekJeVingerInDeLucht.CdDbDiscId);
         }
     }
 }
