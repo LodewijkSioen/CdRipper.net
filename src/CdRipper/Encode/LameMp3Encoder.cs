@@ -7,11 +7,10 @@ namespace CdRipper.Encode
     public class EncoderSettings
     {
         public string OutputFile { get; set; }
-        public SongTag Song { get; set; }
+        public TrackIdentification Track { get; set; }
         public Mp3Settings Mp3Settings { get; set; } 
     }
 
-    public class Id3TagInfo { }
     public class Mp3Settings { }
 
     public class LameMp3Encoder : IDisposable
@@ -24,7 +23,7 @@ namespace CdRipper.Encode
             _lame.StartInfo.FileName = @"lame.exe";
             _lame.StartInfo.UseShellExecute = false;
             _lame.StartInfo.RedirectStandardInput = true;
-            _lame.StartInfo.Arguments = String.Format("-r -m s --tt \"{0}\" --ta \"{1}\" --tl \"{2}\" --tn \"{3}/{4}\" - \"{5}\"", settings.Song.Title, settings.Song.Artist, settings.Song.Disc.Title, settings.Song.TrackNumber, settings.Song.Disc.NumberOfTracks, settings.OutputFile);
+            _lame.StartInfo.Arguments = String.Format("-r -m s --tt \"{0}\" --ta \"{1}\" --tl \"{2}\" --tn \"{3}/{4}\" - \"{5}\"", settings.Track.Title, settings.Track.Artist, settings.Track.Disc.Title, settings.Track.TrackNumber, settings.Track.Disc.NumberOfTracks, settings.OutputFile);
             _lame.StartInfo.CreateNoWindow = true;
             _lame.Start();            
         }

@@ -42,7 +42,7 @@ namespace CdRipper.TestConsole
 
                 foreach (var track in toc.Tracks)
                 {
-                    Console.WriteLine("track {0}: {1} (lenth={2}-{3})", track.TrackNumber, discTag[0].Songs.First(s => s.TrackNumber == track.TrackNumber).Title, track.Offset, track.Offset + track.Sectors);
+                    Console.WriteLine("track {0}: {1} (lenth={2}-{3})", track.TrackNumber, discTag[0].Tracks.First(s => s.TrackNumber == track.TrackNumber).Title, track.Offset, track.Offset + track.Sectors);
                 }
 
                 Console.WriteLine("Enter tracknumber to rip");
@@ -54,7 +54,7 @@ namespace CdRipper.TestConsole
                     using (var encoder = new LameMp3Encoder(new EncoderSettings
                     {
                         OutputFile = output,
-                        Song = discTag[0].Songs.First(s => s.TrackNumber == trackNumber)
+                        Track = discTag[0].Tracks.First(s => s.TrackNumber == trackNumber)
                     }))
                     {
                         var track = toc.Tracks.First(t => t.TrackNumber == trackNumber);

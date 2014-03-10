@@ -20,13 +20,13 @@ namespace CdRipper.Tests.Tagging
             Assert.That(discTags.First().Artist, Is.EqualTo("Jan De Smet"));
             Assert.That(discTags.First().Title, Is.EqualTo("Steek Je vinger in de lucht"));
             Assert.That(discTags.First().NumberOfTracks, Is.EqualTo(14));
-            Assert.That(discTags.First().Songs.Count(), Is.EqualTo(14));
-            Assert.That(discTags.First().Songs.ElementAt(0).Title, Is.EqualTo("Alles Goed"));
-            Assert.That(discTags.First().Songs.ElementAt(0).Artist, Is.EqualTo("Jan De Smet"));
-            Assert.That(discTags.First().Songs.ElementAt(0).TrackNumber, Is.EqualTo(1));
-            Assert.That(discTags.First().Songs.ElementAt(13).Title, Is.EqualTo("Steek Je Vinger in de Lucht"));
-            Assert.That(discTags.First().Songs.ElementAt(13).Artist, Is.EqualTo("Jan De Smet"));
-            Assert.That(discTags.First().Songs.ElementAt(13).TrackNumber, Is.EqualTo(14));
+            Assert.That(discTags.First().Tracks.Count(), Is.EqualTo(14));
+            Assert.That(discTags.First().Tracks.ElementAt(0).Title, Is.EqualTo("Alles Goed"));
+            Assert.That(discTags.First().Tracks.ElementAt(0).Artist, Is.EqualTo("Jan De Smet"));
+            Assert.That(discTags.First().Tracks.ElementAt(0).TrackNumber, Is.EqualTo(1));
+            Assert.That(discTags.First().Tracks.ElementAt(13).Title, Is.EqualTo("Steek Je Vinger in de Lucht"));
+            Assert.That(discTags.First().Tracks.ElementAt(13).Artist, Is.EqualTo("Jan De Smet"));
+            Assert.That(discTags.First().Tracks.ElementAt(13).TrackNumber, Is.EqualTo(14));
         }
 
         [Test, Explicit]
