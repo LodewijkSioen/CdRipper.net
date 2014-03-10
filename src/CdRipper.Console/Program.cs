@@ -54,6 +54,7 @@ namespace CdRipper.TestConsole
                     using (var encoder = new LameMp3Encoder(new EncoderSettings
                     {
                         OutputFile = output,
+                        Mp3Settings = new Mp3Settings(),
                         Track = discTag[0].Tracks.First(s => s.TrackNumber == trackNumber)
                     }))
                     {

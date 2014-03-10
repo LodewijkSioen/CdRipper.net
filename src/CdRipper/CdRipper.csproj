@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Encode\LameArgumentBuilder.cs" />
     <Compile Include="Tagging\IIMusicBrainzApi.cs" />
     <Compile Include="Tagging\MusicBrainzApi.cs" />
     <Compile Include="Tagging\MusicBrainzDiscIdCalculator.cs" />

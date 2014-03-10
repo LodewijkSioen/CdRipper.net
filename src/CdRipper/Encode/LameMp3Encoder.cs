@@ -11,7 +11,31 @@ namespace CdRipper.Encode
         public Mp3Settings Mp3Settings { get; set; } 
     }
 
-    public class Mp3Settings { }
+    public class Mp3Settings
+    {
+        public Mp3Settings()
+        {
+            Bitrate = StandardBitrates.kbs192;
+            Type = BitrateType.Variable;
+        }
+
+        public int Bitrate { get; set; }
+        public BitrateType Type { get; set; }
+
+        public static class StandardBitrates
+        {
+            public const int kbs128 = 128;
+            public const int kbs192 = 192;
+            public const int kbs256 = 256;
+            public const int kbs320 = 320;
+        }
+
+        public enum BitrateType
+        {
+            Variable,
+            Constant
+        }
+    }
 
     public class LameMp3Encoder : IDisposable
     {
@@ -23,7 +47,12 @@ namespace CdRipper.Encode
             _lame.StartInfo.FileName = @"lame.exe";
             _lame.StartInfo.UseShellExecute = false;
             _lame.StartInfo.RedirectStandardInput = true;
-            _lame.StartInfo.Arguments = String.Format("-r -m s --tt \"{0}\" --ta \"{1}\" --tl \"{2}\" --tn \"{3}/{4}\" - \"{5}\"", settings.Track.Title, settings.Track.Artist, settings.Track.Disc.Title, settings.Track.TrackNumber, settings.Track.Disc.NumberOfTracks, settings.OutputFile);
+            _lame.StartInfo.Arguments = new LameArgumentBuilder()
+                                                .AddFileName(settings.OutputFile)
+                                                .AddTagInformation(settings.Track)
+                                                .AddMp3Settings(settings.Mp3Settings)
+                                                .ToString();
+                
             _lame.StartInfo.CreateNoWindow = true;
             _lame.Start();            
         }
