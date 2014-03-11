@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System.Text;
+using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -24,7 +25,7 @@ namespace CdRipper.Tagging
                 var disc = release["media"].First(m => m["discs"].Any(d => (string)d["id"] == discId));
                 var tag = new DiscIdentification
                    {
-                       AlbumArtist = (string)release["artist-credit"][0]["name"],
+                       AlbumArtist = ComposeArtistName(release["artist-credit"]),
                        Title = (string)release["title"],
                        NumberOfTracks = (int)disc["track-count"],
                        Year = (string)release["date"]
@@ -33,7 +34,7 @@ namespace CdRipper.Tagging
                     select new TrackIdentification
                     {
                         Title = (string) t["title"],
-                        Artist = (string) t["artist-credit"][0]["name"],
+                        Artist = ComposeArtistName(release["artist-credit"]),
                         TrackNumber = (int) t["number"],
                         //Genre = (string)t[""], //MusicBrainz doesn't implement genres yet: https://musicbrainz.org/doc/General_FAQ#Why_does_MusicBrainz_not_support_genre_information.3F
                         Disc = tag
@@ -41,6 +42,20 @@ namespace CdRipper.Tagging
 
                 yield return tag;
             }
+        }
+
+        private string ComposeArtistName(IEnumerable<JToken> artistCredit)
+        {
+            var artistBuilder = new StringBuilder();
+
+            foreach (var artist in artistCredit)
+            {
+                artistBuilder
+                    .Append(artist["name"])
+                    .Append(artist["joinphrase"]);
+            }
+
+            return artistBuilder.ToString();
         }
     }
 
