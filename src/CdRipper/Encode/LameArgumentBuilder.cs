@@ -18,7 +18,11 @@ namespace CdRipper.Encode
         {
             AddSwitch("--tt", track.Title);
             AddSwitch("--ta", track.Artist);
+            AddSwitch("--tg", track.Genre);
             AddSwitch("--tl", track.Disc.Title);
+            AddSwitch("--ty", track.Disc.Year);
+            AddSwitch("--ty TPE2=", track.Disc.AlbumArtist); //http://stackoverflow.com/a/5958664/66842
+            //AddSwitch("--ti", track.Disc.AlbumArtLocation);
             AddTrackNumber(track);
             return this;
         }

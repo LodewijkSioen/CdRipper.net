@@ -17,8 +17,9 @@ namespace CdRipper.Tests.Tagging
 
             Assert.That(discTags, Is.Not.Null);
             Assert.That(discTags.Count(), Is.EqualTo(1));
-            Assert.That(discTags.First().Artist, Is.EqualTo("Jan De Smet"));
+            Assert.That(discTags.First().AlbumArtist, Is.EqualTo("Jan De Smet"));
             Assert.That(discTags.First().Title, Is.EqualTo("Steek Je vinger in de lucht"));
+            Assert.That(discTags.First().Year, Is.EqualTo("2005"));
             Assert.That(discTags.First().NumberOfTracks, Is.EqualTo(14));
             Assert.That(discTags.First().Tracks.Count(), Is.EqualTo(14));
             Assert.That(discTags.First().Tracks.ElementAt(0).Title, Is.EqualTo("Alles Goed"));

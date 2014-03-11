@@ -38,7 +38,7 @@ namespace CdRipper.TestConsole
 
                 Console.WriteLine("number of tracks:" + toc.Tracks.Count());
                 Console.WriteLine("MusicBrainz id:" + MusicBrainzDiscIdCalculator.CalculateDiscId(toc));
-                Console.WriteLine("{0} - {1}", discTag[0].Artist, discTag[0].Title);
+                Console.WriteLine("{0} - {1}", discTag[0].AlbumArtist, discTag[0].Title);
 
                 foreach (var track in toc.Tracks)
                 {
