@@ -34,15 +34,23 @@ namespace CdRipper.TestConsole
             using (var drive = new CdDrive(driveletter))
             {
                 var toc = drive.ReadTableOfContents();
-                var discTag = _tagSource.GetTags(MusicBrainzDiscIdCalculator.CalculateDiscId(toc)).ToList();
+                var discId = _tagSource.GetTags(MusicBrainzDiscIdCalculator.CalculateDiscId(toc)).ToList();
 
-                Console.WriteLine("number of tracks:" + toc.Tracks.Count());
-                Console.WriteLine("MusicBrainz id:" + MusicBrainzDiscIdCalculator.CalculateDiscId(toc));
-                Console.WriteLine("{0} - {1}", discTag[0].AlbumArtist, discTag[0].Title);
+                var discNumber = 0;
+                if (discId.Count > 1)
+                {
+                    Console.WriteLine("Multiple matching CD's found in MusicBrainz");
+                    for (int i = 0; i < discId.Count; i++)
+                    {
+                        Console.WriteLine("{0}: {1} - {2}", i+1, discId[i].AlbumArtist, discId[i].Title);
+                    }
+                    Console.WriteLine("Enter the number of the correct cd");
+                    discNumber = Convert.ToInt32(Console.ReadLine()) -1;
+                }
 
                 foreach (var track in toc.Tracks)
                 {
-                    Console.WriteLine("track {0}: {1} (lenth={2}-{3})", track.TrackNumber, discTag[0].Tracks.First(s => s.TrackNumber == track.TrackNumber).Title, track.Offset, track.Offset + track.Sectors);
+                    Console.WriteLine("track {0}: {1} (lenth={2}-{3})", track.TrackNumber, discId[discNumber].Tracks.First(s => s.TrackNumber == track.TrackNumber).Title, track.Offset, track.Offset + track.Sectors);
                 }
 
                 Console.WriteLine("Enter tracknumber to rip");
@@ -55,7 +63,7 @@ namespace CdRipper.TestConsole
                     {
                         OutputFile = output,
                         Mp3Settings = new Mp3Settings(),
-                        Track = discTag[0].Tracks.First(s => s.TrackNumber == trackNumber)
+                        Track = discId[discNumber].Tracks.First(s => s.TrackNumber == trackNumber)
                     }))
                     {
                         var track = toc.Tracks.First(t => t.TrackNumber == trackNumber);
