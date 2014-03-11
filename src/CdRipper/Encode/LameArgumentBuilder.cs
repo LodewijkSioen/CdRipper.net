@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Reflection.Emit;
+using System.Text;
 using CdRipper.Tagging;
 
 namespace CdRipper.Encode
@@ -21,7 +22,7 @@ namespace CdRipper.Encode
             AddSwitch("--tg", track.Genre);
             AddSwitch("--tl", track.Disc.Title);
             AddSwitch("--ty", track.Disc.Year);
-            AddSwitch("--ty TPE2=", track.Disc.AlbumArtist); //http://stackoverflow.com/a/5958664/66842
+            AddExtraId3Tag("TPE2", track.Disc.AlbumArtist); //http://stackoverflow.com/a/5958664/66842
             //AddSwitch("--ti", track.Disc.AlbumArtLocation);
             AddTrackNumber(track);
             return this;
@@ -38,6 +39,14 @@ namespace CdRipper.Encode
             if (!string.IsNullOrWhiteSpace(value))
             {
                 _arguments.AppendFormat("{0} \"{1}\" ", key, value);
+            }
+        }
+
+        private void AddExtraId3Tag(string tagname, string value)
+        {
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                _arguments.AppendFormat("--tv {0}=\"{1}\" ", tagname, value);
             }
         }
 
