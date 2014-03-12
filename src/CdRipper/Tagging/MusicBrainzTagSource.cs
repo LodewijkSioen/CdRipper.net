@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using CdRipper.Rip;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,12 @@ namespace CdRipper.Tagging
         public MusicBrainzTagSource(IIMusicBrainzApi musicBrainzApi)
         {
             _api = musicBrainzApi;
+        }
+
+        public IEnumerable<DiscIdentification> GetTags(TableOfContents toc)
+        {
+            var discId = MusicBrainzDiscIdCalculator.CalculateDiscId(toc);
+            return GetTags(discId);
         }
 
         public IEnumerable<DiscIdentification> GetTags(string discId)

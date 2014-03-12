@@ -7,16 +7,10 @@ namespace CdRipper.Rip
 
     public class TrackReader : IDisposable
     {
-        private CdDrive _drive;
+        private ICdDrive _drive;
         private bool _isLocked;
-
-        public TrackReader(string driveName)
-        {
-            _drive = new CdDrive(driveName);
-            _isLocked = _drive.Lock();
-        }
-
-        public TrackReader(CdDrive drive)
+       
+        public TrackReader(ICdDrive drive)
         {
             _drive = drive;
             _isLocked = drive.Lock();

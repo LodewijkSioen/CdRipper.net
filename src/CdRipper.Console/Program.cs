@@ -8,7 +8,7 @@ namespace CdRipper.TestConsole
 {
     class Program
     {
-       static MusicBrainzTagSource _tagSource = new MusicBrainzTagSource(new MusicBrainzApi("http://musicbrainz.org/"));
+       static readonly MusicBrainzTagSource TagSource = new MusicBrainzTagSource(new MusicBrainzApi("http://musicbrainz.org/"));
 
 
         static void Main(string[] args)
@@ -31,10 +31,10 @@ namespace CdRipper.TestConsole
 
         static void RipWithMusicBrainz(string driveletter)
         {
-            using (var drive = new CdDrive(driveletter))
+            using (var drive = CdDrive.Create(driveletter))
             {
                 var toc = drive.ReadTableOfContents();
-                var discId = _tagSource.GetTags(MusicBrainzDiscIdCalculator.CalculateDiscId(toc)).ToList();
+                var discId = TagSource.GetTags(toc).ToList();
 
                 var discNumber = 0;
                 if (discId.Count > 1)
@@ -56,7 +56,7 @@ namespace CdRipper.TestConsole
                 Console.WriteLine("Enter tracknumber to rip");
                 var trackNumber = Convert.ToInt32(Console.ReadLine());
 
-                using (var trackReader = new TrackReader(driveletter))
+                using (var trackReader = new TrackReader(drive))
                 {
                     var output=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), String.Format(@"encoding\track{0:00}.mp3", trackNumber));
                     using (var encoder = new LameMp3Encoder(new EncoderSettings

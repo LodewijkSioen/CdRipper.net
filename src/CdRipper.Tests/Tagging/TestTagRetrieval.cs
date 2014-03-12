@@ -13,7 +13,7 @@ namespace CdRipper.Tests.Tagging
         {
             var tagSource = new MusicBrainzTagSource(new MockMusicBrainzApi());
 
-            var discTags = tagSource.GetTags(DummyData.SteekJeVingerInDeLucht.MusicBrainzDiscId);
+            var discTags = tagSource.GetTags(DummyData.SteekJeVingerInDeLucht.MusicBrainzDiscId).ToList();
 
             Assert.That(discTags, Is.Not.Null);
             Assert.That(discTags.Count(), Is.EqualTo(1));

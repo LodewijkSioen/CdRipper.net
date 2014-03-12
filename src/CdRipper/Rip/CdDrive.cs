@@ -3,20 +3,35 @@ using System.Runtime.InteropServices;
 
 namespace CdRipper.Rip
 {
-    public class CdDrive : IDisposable
+    public interface ICdDrive : IDisposable
+    {
+        bool IsCdInDrive();
+        TableOfContents ReadTableOfContents();
+        byte[] ReadSector(int startSector, int numberOfSectors);
+        bool Lock();
+        bool UnLock();
+    }
+
+    public class CdDrive : ICdDrive
     {
         private IntPtr _driveHandle;
 
-        public string DriveName { get; private set; }
+        private string _driveName;
 
-        public CdDrive(string driveName)
+        public static ICdDrive Create(string driveName)
+        {
+            //Factory to force usage of interface
+            return new CdDrive(driveName);
+        }
+
+        private CdDrive(string driveName)
         {
             if (Win32Functions.GetDriveType(driveName + ":\\") != Win32Functions.DriveTypes.DRIVE_CDROM)
             {
                 throw new InvalidOperationException("Drive '" + driveName + "' is not an optical disc drive.");
             }
 
-            DriveName = driveName;
+            _driveName = driveName;
             _driveHandle = CreateDriveHandle();
         }
 
@@ -82,20 +97,20 @@ namespace CdRipper.Rip
 
         private IntPtr CreateDriveHandle()
         {
-            var handle = Win32Functions.CreateFile("\\\\.\\" + DriveName + ':', Win32Functions.GENERIC_READ,
+            var handle = Win32Functions.CreateFile("\\\\.\\" + _driveName + ':', Win32Functions.GENERIC_READ,
                 Win32Functions.FILE_SHARE_READ, IntPtr.Zero, Win32Functions.OPEN_EXISTING, 0, IntPtr.Zero);
             if (IsValidHandle(handle))
             {
                 return handle;
             }
-            throw new InvalidOperationException("Drive '" + DriveName + "' is currently opened.");
+            throw new InvalidOperationException("Drive '" + _driveName + "' is currently opened.");
         }
 
         public void Dispose()
         {
             Win32Functions.CloseHandle(_driveHandle);
             _driveHandle = IntPtr.Zero;
-            DriveName = null;
+            _driveName = null;
             GC.SuppressFinalize(this);
         }
 

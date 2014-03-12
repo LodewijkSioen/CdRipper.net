@@ -12,7 +12,7 @@ namespace CdRipper.Tests
         {
             var dummyToc = DummyData.SteekJeVingerInDeLucht.GetTableOfContents();
 
-            using (var drive = new CdDrive("f"))
+            using (var drive = CdDrive.Create("f"))
             {
                 var realToc = drive.ReadTableOfContents();
 
@@ -32,7 +32,7 @@ namespace CdRipper.Tests
         [Test, Explicit]
         public void GenerateDummyData()
         {
-            using (var nativeDrive = new CdDrive("f"))
+            using (var nativeDrive = CdDrive.Create("f"))
             {
                 var toc = nativeDrive.ReadTableOfContents();
                 foreach (var track in toc.Tracks)
