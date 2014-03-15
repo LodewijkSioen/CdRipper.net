@@ -30,6 +30,16 @@ namespace CdRipper.Tests.Tagging
             Assert.That(discTags.First().Tracks.ElementAt(13).TrackNumber, Is.EqualTo(14));
         }
 
+        [Test]
+        public void TestGettingAnUnknownDiscId()
+        {
+            var tagSource = new MusicBrainzTagSource(new MockMusicBrainzApi());
+
+            var discTags = tagSource.GetTags("NotFound").ToList();
+
+            Assert.That(discTags.Any(), Is.False);
+        }
+
         [Test, Explicit]
         public void TestDummyData()
         {
@@ -60,14 +70,14 @@ namespace CdRipper.Tests.Tagging
             };
         }
 
-        public string GetReleasesByDiscId(string discId)
+        public MusicBrainzResponse GetReleasesByDiscId(string discId)
         {
-            return _releasesForDiscId[discId];
+            return discId == "NotFound" ? new MusicBrainzResponse(false, null) : new MusicBrainzResponse(true, _releasesForDiscId[discId]);
         }
 
-        public string GetRelease(string releaseId)
+        public MusicBrainzResponse GetRelease(string releaseId)
         {
-            return _releases[releaseId];
+            return new MusicBrainzResponse(true, _releases[releaseId]);
         }
     }
 }

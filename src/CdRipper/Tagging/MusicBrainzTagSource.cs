@@ -23,12 +23,23 @@ namespace CdRipper.Tagging
 
         public IEnumerable<DiscIdentification> GetTags(string discId)
         {
-            var json = _api.GetReleasesByDiscId(discId);
+            var response = _api.GetReleasesByDiscId(discId);
 
-            foreach (var r in JObject.Parse(json)["releases"])
+            if (!response.IsFound)
             {
-                var releaseJson = _api.GetRelease((string)r["id"]);
-                var release = JObject.Parse(releaseJson);
+                yield break;
+            }
+
+            foreach (var r in JObject.Parse(response.Json)["releases"])
+            {
+                var releaseResponse = _api.GetRelease((string)r["id"]);
+                if (!releaseResponse.IsFound)
+                {
+                    //TODO: I should probably log this somewhere..
+                    continue;   
+                }
+
+                var release = JObject.Parse(releaseResponse.Json);
                 var disc = release["media"].First(m => m["discs"].Any(d => (string)d["id"] == discId));
                 var tag = new DiscIdentification
                    {
