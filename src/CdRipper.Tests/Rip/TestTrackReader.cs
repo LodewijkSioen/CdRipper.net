@@ -12,7 +12,7 @@ namespace CdRipper.Tests.Rip
         [Test]
         public void CheckIfCorrectSectorsAreRead()
         {
-            var toc = DummyData.SteekJeVingerInDeLucht.GetTableOfContents();
+            var toc = DummyData.SteekJeVingerInDeLucht.TableOfContents;
             var track = new Track(1, 150, 26);
             var data = new int[track.Sectors];
 

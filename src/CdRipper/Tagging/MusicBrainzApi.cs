@@ -19,6 +19,14 @@ namespace CdRipper.Tagging
             Json = json;
             IsFound = isFound;
         }
+
+        public override bool Equals(object obj)
+        {
+            var other = obj as MusicBrainzResponse;
+            if (other == null) return false;
+
+            return other.IsFound == this.IsFound && other.Json == this.Json;
+        }
     }
 
     public class MusicBrainzApi : IIMusicBrainzApi

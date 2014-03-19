@@ -1,5 +1,6 @@
 using System;
 using CdRipper.Rip;
+using CdRipper.Tagging;
 using NUnit.Framework;
 
 namespace CdRipper.Tests
@@ -10,7 +11,7 @@ namespace CdRipper.Tests
         [Test, Explicit]
         public void TestDummyData()
         {
-            var dummyToc = DummyData.SteekJeVingerInDeLucht.GetTableOfContents();
+            var dummyToc = DummyData.AppelsEten.TableOfContents;
 
             using (var drive = CdDrive.Create("f"))
             {
@@ -39,6 +40,7 @@ namespace CdRipper.Tests
                 {
                     Console.WriteLine("new Track({0}, {1}, {2}),", track.TrackNumber, track.Offset, track.Sectors);
                 }
+                Console.WriteLine("DiscId: " + MusicBrainzDiscIdCalculator.CalculateDiscId(toc));
             }
         }
     }
