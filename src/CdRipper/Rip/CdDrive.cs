@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Runtime.InteropServices;
 
 namespace CdRipper.Rip
@@ -17,6 +18,11 @@ namespace CdRipper.Rip
         private IntPtr _driveHandle;
 
         private string _driveName;
+
+        public static ICdDrive Create(DriveInfo drive)
+        {
+            return CdDrive.Create(drive.Name.Substring(0, 1));
+        }
 
         public static ICdDrive Create(string driveName)
         {
