@@ -1,4 +1,6 @@
-﻿using CdRipper.Encode;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using CdRipper.Encode;
 using CdRipper.Rip;
 using System;
 using System.IO;
@@ -20,7 +22,7 @@ namespace CdRipper.TestConsole
                 Console.WriteLine();
                 try
                 {
-                    RipWithMusicBrainz(driveletter);
+                    RipWithMusicBrainz(driveletter).Wait();
                 }
                 catch (Exception e)
                 {
@@ -29,12 +31,24 @@ namespace CdRipper.TestConsole
             }
         }
 
-        static void RipWithMusicBrainz(string driveletter)
+        static async Task RipWithMusicBrainz(string driveletter)
         {
             using (var drive = CdDrive.Create(driveletter))
             {
-                var toc = drive.ReadTableOfContents();
+                var toc = await drive.ReadTableOfContents();
+                if (toc == null)
+                {
+                    Console.WriteLine("No CD in drive!");
+                    return;
+                }
+
                 var discId = TagSource.GetTags(toc).ToList();
+
+                if (discId.Count == 0)
+                {
+                    Console.WriteLine("No matching cd found in MusicBrainz");
+                    return;
+                }
 
                 var discNumber = 0;
                 if (discId.Count > 1)
@@ -66,8 +80,10 @@ namespace CdRipper.TestConsole
                         Track = discId[discNumber].Tracks.First(s => s.TrackNumber == trackNumber)
                     }))
                     {
+                        var cts = new CancellationTokenSource();
+                        cts.CancelAfter(3000);
                         var track = toc.Tracks.First(t => t.TrackNumber == trackNumber);
-                        trackReader.ReadTrack(track.Offset, track.Sectors,
+                        await trackReader.ReadTrack(track.Offset, track.Sectors,
                             b =>
                             {
                                 encoder.Write(b);
@@ -75,7 +91,7 @@ namespace CdRipper.TestConsole
                             (i, a) =>
                             {
                                 Console.WriteLine("{0} of {1} read", i, a);
-                            });
+                            }, cts.Token);
                     }
                 }
             }

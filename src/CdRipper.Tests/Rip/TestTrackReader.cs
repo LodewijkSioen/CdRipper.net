@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections;
-using System.Linq;
+﻿using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using CdRipper.Rip;
 using NUnit.Framework;
 
@@ -13,37 +13,39 @@ namespace CdRipper.Tests.Rip
         public void CheckIfCorrectSectorsAreRead()
         {
             var toc = DummyData.SteekJeVingerInDeLucht.TableOfContents;
-            var track = new Track(1, 150, 26);
-            var data = new int[track.Sectors];
 
-            var dummyDrive = new DummyDrive(toc, (offset, numberOfSectors) =>
-            {
-                foreach (var index in Enumerable.Range(offset, numberOfSectors))
-                {
-                    data.SetValue(1, index);
-                }
-
-                return new byte[numberOfSectors];
-            });
+            var dummyDrive = new DummyDrive(toc);
+            var bytesRead = 0;
 
             using (var reader = new TrackReader(dummyDrive))
             {
-                reader.ReadTrack(track, buffer => { }, (read, bytes) => { });
+                reader.ReadTrack(150, 25, buffer =>
+                {
+                    Assert.That(buffer, Has.All.EqualTo((byte)1));
+                    bytesRead += buffer.Length;
+                }, (read, bytes) => { }, CancellationToken.None).Wait();
             }
 
-            Assert.That(data, Has.All.EqualTo(1));
+            Assert.That(dummyDrive.StartSectors[0], Is.EqualTo(0), "We don't want the 2s lead-in when reading from the disc");
+            Assert.That(dummyDrive.StartSectors[1], Is.EqualTo(13), "We use 13 byte buffers (why?)");
+            Assert.That(dummyDrive.NumberOfSectors[0], Is.EqualTo(13), "We use 13 byte buffers (why?)");
+            Assert.That(dummyDrive.NumberOfSectors[1], Is.EqualTo(12), "Unless there are not enough bytes left to read");
+
+            Assert.That(bytesRead, Is.EqualTo(25));
         }
     }
 
     public class DummyDrive : ICdDrive
     {
         private readonly TableOfContents _toc;
-        private readonly Func<int, int, byte[]> _readSectorImp;
 
-        public DummyDrive(TableOfContents toc, Func<int, int, byte[]> readSectorImp = null)
+        public IList<int> StartSectors = new List<int>();
+        public IList<int> NumberOfSectors = new List<int>();
+
+
+        public DummyDrive(TableOfContents toc)
         {
             _toc = toc;
-            _readSectorImp = readSectorImp ?? ((offset, numberOfSectors) => new byte[numberOfSectors]) ;
         }
 
         public void Dispose()
@@ -51,29 +53,37 @@ namespace CdRipper.Tests.Rip
             
         }
 
-        public bool IsCdInDrive()
+        public async Task<bool> IsCdInDrive()
         {
-            return true;
+            return await Task.Run(() => true);
         }
 
-        public TableOfContents ReadTableOfContents()
+        public async Task<TableOfContents> ReadTableOfContents()
         {
-            return _toc;
+            return await Task.Run(() =>_toc);
         }
 
-        public byte[] ReadSector(int startSector, int numberOfSectors)
+        public async Task<byte[]> ReadSector(int startSector, int numberOfSectors)
         {
-            return _readSectorImp(startSector, numberOfSectors);
+            StartSectors.Add(startSector);
+            NumberOfSectors.Add(numberOfSectors);
+
+            var bytes = new byte[numberOfSectors];
+            for (var i = 0; i < numberOfSectors; i++)
+            {
+                bytes.SetValue((byte)1, i);
+            }
+            return await Task.Run(() =>  bytes);
         }
 
-        public bool Lock()
+        public async Task<bool> Lock()
         {
-            return true;
+            return await Task.Run(() =>true);
         }
 
-        public bool UnLock()
+        public async Task<bool> UnLock()
         {
-            return true;
+            return await Task.Run(() =>true);
         }
     }
 }

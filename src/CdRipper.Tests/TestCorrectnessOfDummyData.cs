@@ -11,11 +11,11 @@ namespace CdRipper.Tests
         [Test, Explicit]
         public void TestDummyData()
         {
-            var dummyToc = DummyData.AppelsEten.TableOfContents;
+            var dummyToc = DummyData.SteekJeVingerInDeLucht.TableOfContents;
 
             using (var drive = CdDrive.Create("f"))
             {
-                var realToc = drive.ReadTableOfContents();
+                var realToc = drive.ReadTableOfContents().Result;
 
                 for (var i = 0; i < realToc.Tracks.Count; i++)
                 {
@@ -35,7 +35,7 @@ namespace CdRipper.Tests
         {
             using (var nativeDrive = CdDrive.Create("f"))
             {
-                var toc = nativeDrive.ReadTableOfContents();
+                var toc = nativeDrive.ReadTableOfContents().Result;
                 foreach (var track in toc.Tracks)
                 {
                     Console.WriteLine("new Track({0}, {1}, {2}),", track.TrackNumber, track.Offset, track.Sectors);

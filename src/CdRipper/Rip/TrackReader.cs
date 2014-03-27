@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace CdRipper.Rip
 {
@@ -13,15 +15,20 @@ namespace CdRipper.Rip
         public TrackReader(ICdDrive drive)
         {
             _drive = drive;
-            _isLocked = drive.Lock();
+            _isLocked = drive.Lock().Result;
         }
 
-        public void ReadTrack(Track track, OnReadingTrack onDataRead, OnTrackReadingProgress onProgress)
+        public async Task ReadTrack(Track track, OnReadingTrack onDataRead, OnTrackReadingProgress onProgress)
         {
-            ReadTrack(track.Offset, track.Sectors, onDataRead, onProgress);
+            await ReadTrack(track, onDataRead, onProgress, CancellationToken.None);
         }
 
-        public void ReadTrack(int offset, int sectors, OnReadingTrack onDataRead, OnTrackReadingProgress onProgress)
+        public async Task ReadTrack(Track track, OnReadingTrack onDataRead, OnTrackReadingProgress onProgress, CancellationToken token)
+        {
+            await ReadTrack(track.Offset, track.Sectors, onDataRead, onProgress, token);
+        }
+
+        public async Task ReadTrack(int offset, int sectors, OnReadingTrack onDataRead, OnTrackReadingProgress onProgress, CancellationToken token)
         {
             var bytes2Read = (uint)(sectors) * Constants.CB_AUDIO;
             var bytesRead = (uint)0;
@@ -33,8 +40,11 @@ namespace CdRipper.Rip
 
             for (int sector = 0; (sector < sectors); sector += Constants.NSECTORS)
             {
+                if(token.IsCancellationRequested)
+                    return;
+
                 var sectors2Read = ((sector + Constants.NSECTORS) < sectors) ? Constants.NSECTORS : (sectors - sector);
-                var buffer = _drive.ReadSector(offset - 150 + sector, sectors2Read);//No 2 second lead in for reading the track
+                var buffer = await _drive.ReadSector(offset - 150 + sector, sectors2Read);//No 2 second lead in for reading the track
                 
                 onDataRead(buffer);
                 bytesRead += (uint)(Constants.CB_AUDIO * sectors2Read);
@@ -50,7 +60,7 @@ namespace CdRipper.Rip
         {
             if (_isLocked)
             {
-                _isLocked = !_drive.UnLock();
+                _isLocked = !_drive.UnLock().Result;
             }
             _drive = null;
         }

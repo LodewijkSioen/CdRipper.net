@@ -1,16 +1,17 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace CdRipper.Rip
 {
     public interface ICdDrive : IDisposable
     {
-        bool IsCdInDrive();
-        TableOfContents ReadTableOfContents();
-        byte[] ReadSector(int startSector, int numberOfSectors);
-        bool Lock();
-        bool UnLock();
+        Task<bool> IsCdInDrive();
+        Task<TableOfContents> ReadTableOfContents();
+        Task<byte[]> ReadSector(int startSector, int numberOfSectors);
+        Task<bool> Lock();
+        Task<bool> UnLock();
     }
 
     public class CdDrive : ICdDrive
@@ -38,48 +39,65 @@ namespace CdRipper.Rip
             }
 
             _driveName = driveName;
-            _driveHandle = CreateDriveHandle();
+            _driveHandle = CreateDriveHandle().Result;
         }
 
-        public bool IsCdInDrive()
+        public async Task<bool> IsCdInDrive()
         {
-            uint dummy = 0;
-            var check = Win32Functions.DeviceIoControl(_driveHandle, Win32Functions.IOCTL_STORAGE_CHECK_VERIFY, IntPtr.Zero, 0, IntPtr.Zero, 0, ref dummy, IntPtr.Zero);
-            return check != 0;
-        }
-
-        public TableOfContents ReadTableOfContents()
-        {
-            var toc = new Win32Functions.CDROM_TOC();
-            uint bytesRead = 0; 
-            var succes = Win32Functions.DeviceIoControl(_driveHandle, Win32Functions.IOCTL_CDROM_READ_TOC, IntPtr.Zero, 0, toc, (uint)Marshal.SizeOf(toc), ref bytesRead, IntPtr.Zero) != 0;
-            if (!succes)
+            return await Task.Run(() =>
             {
-                throw new Exception("Reading the TOC failed.");
+                uint dummy = 0;
+                var check = Win32Functions.DeviceIoControl(_driveHandle, Win32Functions.IOCTL_STORAGE_CHECK_VERIFY,
+                    IntPtr.Zero, 0, IntPtr.Zero, 0, ref dummy, IntPtr.Zero);
+                return check != 0;
+            });
+        }
+
+        public async Task<TableOfContents> ReadTableOfContents()
+        {
+            if (!await IsCdInDrive())
+            {
+                return null;
             }
-            return TableOfContents.Create(toc);
+
+            return await Task.Run(() =>
+            {
+                var toc = new Win32Functions.CDROM_TOC();
+                uint bytesRead = 0;
+                var succes =
+                    Win32Functions.DeviceIoControl(_driveHandle, Win32Functions.IOCTL_CDROM_READ_TOC, IntPtr.Zero, 0,
+                        toc, (uint) Marshal.SizeOf(toc), ref bytesRead, IntPtr.Zero) != 0;
+                if (!succes)
+                {
+                    throw new Exception("Reading the TOC failed.");
+                }
+                return TableOfContents.Create(toc);
+            });
         }        
 
-        public byte[] ReadSector(int startSector, int numberOfSectors)
+        public async Task<byte[]> ReadSector(int startSector, int numberOfSectors)
         {
-            var rri = new Win32Functions.RAW_READ_INFO
+            return await Task.Run(() =>
             {
-                TrackMode = Win32Functions.TRACK_MODE_TYPE.CDDA,
-                SectorCount = (uint) numberOfSectors,
-                DiskOffset = startSector * Constants.CB_CDROMSECTOR
-            };
+                var rri = new Win32Functions.RAW_READ_INFO
+                {
+                    TrackMode = Win32Functions.TRACK_MODE_TYPE.CDDA,
+                    SectorCount = (uint) numberOfSectors,
+                    DiskOffset = startSector*Constants.CB_CDROMSECTOR
+                };
 
-            uint bytesRead = 0;
-            var buffer = new byte[Constants.CB_AUDIO * Constants.NSECTORS];
-            var success = Win32Functions.DeviceIoControl(_driveHandle, Win32Functions.IOCTL_CDROM_RAW_READ, rri,
-                (uint) Marshal.SizeOf(rri), buffer, (uint) numberOfSectors*Constants.CB_AUDIO, ref bytesRead,
-                IntPtr.Zero);
+                uint bytesRead = 0;
+                var buffer = new byte[Constants.CB_AUDIO*numberOfSectors];
+                var success = Win32Functions.DeviceIoControl(_driveHandle, Win32Functions.IOCTL_CDROM_RAW_READ, rri,
+                    (uint) Marshal.SizeOf(rri), buffer, (uint) buffer.Length, ref bytesRead,
+                    IntPtr.Zero);
 
-            if (success != 0)
-            {
-                return buffer;
-            }
-            throw new Exception("Failed to read from disk");
+                if (success != 0)
+                {
+                    return buffer;
+                }
+                throw new Exception("Failed to read from disk");
+            });
         }
 
         private bool IsValidHandle(IntPtr handle)
@@ -87,33 +105,45 @@ namespace CdRipper.Rip
             return ((int) handle != -1) && ((int) handle != 0);
         }
 
-        public bool Lock()
+        public async Task<bool> Lock()
         {
-            uint dummy = 0;
-            var pmr = new Win32Functions.PREVENT_MEDIA_REMOVAL { PreventMediaRemoval = 1 };
-            return Win32Functions.DeviceIoControl(_driveHandle, Win32Functions.IOCTL_STORAGE_MEDIA_REMOVAL, pmr, (uint)Marshal.SizeOf(pmr), IntPtr.Zero, 0, ref dummy, IntPtr.Zero) != 0;
-        }
-
-        public bool UnLock()
-        {
-            uint dummy = 0;
-            var pmr = new Win32Functions.PREVENT_MEDIA_REMOVAL { PreventMediaRemoval = 0 };
-            return Win32Functions.DeviceIoControl(_driveHandle, Win32Functions.IOCTL_STORAGE_MEDIA_REMOVAL, pmr, (uint)Marshal.SizeOf(pmr), IntPtr.Zero, 0, ref dummy, IntPtr.Zero) == 0;
-        }
-
-        private IntPtr CreateDriveHandle()
-        {
-            var handle = Win32Functions.CreateFile("\\\\.\\" + _driveName + ':', Win32Functions.GENERIC_READ,
-                Win32Functions.FILE_SHARE_READ, IntPtr.Zero, Win32Functions.OPEN_EXISTING, 0, IntPtr.Zero);
-            if (IsValidHandle(handle))
+            return await Task.Run(() =>
             {
-                return handle;
-            }
-            throw new InvalidOperationException("Drive '" + _driveName + "' is currently opened.");
+                uint dummy = 0;
+                var pmr = new Win32Functions.PREVENT_MEDIA_REMOVAL {PreventMediaRemoval = 1};
+                return
+                    Win32Functions.DeviceIoControl(_driveHandle, Win32Functions.IOCTL_STORAGE_MEDIA_REMOVAL, pmr,
+                        (uint) Marshal.SizeOf(pmr), IntPtr.Zero, 0, ref dummy, IntPtr.Zero) != 0;
+            });
+        }
+
+        public async Task<bool> UnLock()
+        {
+            return await Task.Run(() =>
+            {
+                uint dummy = 0;
+                var pmr = new Win32Functions.PREVENT_MEDIA_REMOVAL { PreventMediaRemoval = 0 };
+                return Win32Functions.DeviceIoControl(_driveHandle, Win32Functions.IOCTL_STORAGE_MEDIA_REMOVAL, pmr, (uint)Marshal.SizeOf(pmr), IntPtr.Zero, 0, ref dummy, IntPtr.Zero) == 0;
+            });
+        }
+
+        private async Task<IntPtr> CreateDriveHandle()
+        {
+            return await Task.Run(() =>
+            {
+                var handle = Win32Functions.CreateFile("\\\\.\\" + _driveName + ':', Win32Functions.GENERIC_READ,
+                    Win32Functions.FILE_SHARE_READ, IntPtr.Zero, Win32Functions.OPEN_EXISTING, 0, IntPtr.Zero);
+                if (IsValidHandle(handle))
+                {
+                    return handle;
+                }
+                throw new InvalidOperationException("Drive '" + _driveName + "' is currently opened.");
+            });
         }
 
         public void Dispose()
         {
+            UnLock().Wait();
             Win32Functions.CloseHandle(_driveHandle);
             _driveHandle = IntPtr.Zero;
             _driveName = null;
