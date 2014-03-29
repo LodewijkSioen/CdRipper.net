@@ -1,4 +1,4 @@
-﻿using System.Reflection.Emit;
+﻿using System.IO;
 using System.Text;
 using CdRipper.Tagging;
 
@@ -17,6 +17,8 @@ namespace CdRipper.Encode
 
         public LameArgumentBuilder AddTagInformation(TrackIdentification track)
         {
+            track = track ?? TrackIdentification.Default;
+
             AddSwitch("--tt", track.Title);
             AddSwitch("--ta", track.Artist);
             AddSwitch("--tg", track.Genre);
@@ -30,7 +32,20 @@ namespace CdRipper.Encode
 
         public LameArgumentBuilder AddFileName(string filename)
         {
-            _fileName = filename;
+            _fileName = filename ?? "track-" + Path.GetRandomFileName() + ".mp3";
+            return this;
+        }
+
+        public LameArgumentBuilder AddMp3Settings(Mp3Settings mp3Settings)
+        {
+            mp3Settings = mp3Settings ?? Mp3Settings.Default;
+
+            if (mp3Settings.Type == Mp3Settings.BitrateType.Variable)
+            {
+                AddSwitch("-V", "4"); //Variable bitrate defaults to 4
+            }
+            AddSwitch("-b", mp3Settings.Bitrate.ToString("N"));
+
             return this;
         }
 
@@ -70,17 +85,6 @@ namespace CdRipper.Encode
             _arguments.Append("- "); //input is stin
             _arguments.AppendFormat("\"{0}\"", _fileName); //output is file
             return _arguments.ToString();
-        }
-
-        public LameArgumentBuilder AddMp3Settings(Mp3Settings mp3Settings)
-        {
-            if (mp3Settings.Type == Mp3Settings.BitrateType.Variable)
-            {
-                AddSwitch("-V", "4"); //Variable bitrate defaults to 4
-            }
-            AddSwitch("-b", mp3Settings.Bitrate.ToString("N"));
-
-            return this;
         }
     }
 }

@@ -22,6 +22,18 @@ namespace CdRipper.Encode
         public int Bitrate { get; set; }
         public BitrateType Type { get; set; }
 
+        public static Mp3Settings Default
+        {
+            get
+            {
+                return new Mp3Settings
+                {
+                    Bitrate = StandardBitrates.kbs192,
+                    Type = BitrateType.Variable
+                };
+            }
+        }
+
         public static class StandardBitrates
         {
             public const int kbs128 = 128;

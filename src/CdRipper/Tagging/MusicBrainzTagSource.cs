@@ -129,5 +129,21 @@ namespace CdRipper.Tagging
         public int TrackNumber { get; set; }
         public DiscIdentification Disc { get; set; }
         public string Genre { get; set; }
+
+        public static TrackIdentification Default
+        {
+            get
+            {
+                return new TrackIdentification
+                {
+                    Artist = "Unknow Artist",
+                    Disc = new DiscIdentification
+                    {
+                        AlbumArtist = "Unkown Artist",
+                        Title = "Unknown Title"
+                    }
+                };
+            }
+        }
     }
 }
