@@ -1,6 +1,4 @@
-﻿using System.Linq.Expressions;
-using System.Text;
-using System.Threading;
+﻿using System.Text;
 using CdRipper.Rip;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
@@ -46,7 +44,7 @@ namespace CdRipper.Tagging
 
             return new DiscIdentification
             {
-                Title = (string)stub["title"],
+                AlbumTitle = (string)stub["title"],
                 AlbumArtist = (string)stub["artist"],
                 NumberOfTracks = (int?)stub["track-count"] ?? stub["tracks"].Count(),
                 Tracks = stub["tracks"].Select((t, index) => 
@@ -54,7 +52,10 @@ namespace CdRipper.Tagging
                          {
                              Artist = (string)t["artist"],
                              Title = (string)t["title"],
-                             TrackNumber = index +1
+                             TrackNumber = index +1,
+                             AlbumTitle = (string)stub["title"],
+                             AlbumArtist = (string)stub["artist"],
+                             TotalNumberOfTracks = (int?)stub["track-count"] ?? stub["tracks"].Count(),
                          })
             };
         }
@@ -75,19 +76,22 @@ namespace CdRipper.Tagging
                 var tag = new DiscIdentification
                 {
                     AlbumArtist = ComposeArtistName(release["artist-credit"]),
-                    Title = (string)release["title"],
-                    NumberOfTracks = (int)disc["track-count"],
-                    Year = (string)release["date"]
+                    AlbumTitle = (string)release["title"],
+                    NumberOfTracks = (int) disc["track-count"],
+                    Year = (string) release["date"],
+                    Tracks = from t in disc["tracks"]
+                        select new TrackIdentification
+                        {
+                            Title = (string) t["title"],
+                            Artist = ComposeArtistName(release["artist-credit"]),
+                            TrackNumber = (int) t["number"],
+                            //Genre = (string)t[""], //MusicBrainz doesn't implement genres yet: https://musicbrainz.org/doc/General_FAQ#Why_does_MusicBrainz_not_support_genre_information.3F
+                            AlbumArtist = ComposeArtistName(release["artist-credit"]),
+                            AlbumTitle = (string) release["title"],
+                            TotalNumberOfTracks = (int) disc["track-count"],
+                            Year = (string) release["date"]
+                        }
                 };
-                tag.Tracks = from t in disc["tracks"]
-                             select new TrackIdentification
-                             {
-                                 Title = (string)t["title"],
-                                 Artist = ComposeArtistName(release["artist-credit"]),
-                                 TrackNumber = (int)t["number"],
-                                 //Genre = (string)t[""], //MusicBrainz doesn't implement genres yet: https://musicbrainz.org/doc/General_FAQ#Why_does_MusicBrainz_not_support_genre_information.3F
-                                 Disc = tag
-                             };
 
                 yield return tag;
             }
@@ -115,9 +119,9 @@ namespace CdRipper.Tagging
 
     public class DiscIdentification
     {
-        public string AlbumArtist { get; set; }
-        public string Title { get; set; }
         public IEnumerable<TrackIdentification> Tracks { get; set; }
+        public string AlbumArtist { get; set; }
+        public string AlbumTitle { get; set; }
         public int NumberOfTracks { get; set; }
         public string Year { get; set; }
     }
@@ -127,8 +131,12 @@ namespace CdRipper.Tagging
         public string Artist { get; set; }
         public string Title { get; set; }
         public int TrackNumber { get; set; }
-        public DiscIdentification Disc { get; set; }
         public string Genre { get; set; }
+        
+        public string AlbumArtist { get; set; }
+        public string AlbumTitle { get; set; }
+        public string Year { get; set; }
+        public int TotalNumberOfTracks { get; set; }
 
         public static TrackIdentification Default
         {
@@ -137,11 +145,8 @@ namespace CdRipper.Tagging
                 return new TrackIdentification
                 {
                     Artist = "Unknow Artist",
-                    Disc = new DiscIdentification
-                    {
-                        AlbumArtist = "Unkown Artist",
-                        Title = "Unknown Title"
-                    }
+                    AlbumArtist = "Unkown Artist",
+                    Title = "Unknown Title"
                 };
             }
         }

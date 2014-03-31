@@ -56,7 +56,7 @@ namespace CdRipper.TestConsole
                     Console.WriteLine("Multiple matching CD's found in MusicBrainz");
                     for (int i = 0; i < discId.Count; i++)
                     {
-                        Console.WriteLine("{0}: {1} - {2}", i+1, discId[i].AlbumArtist, discId[i].Title);
+                        Console.WriteLine("{0}: {1} - {2}", i+1, discId[i].AlbumArtist, discId[i].AlbumTitle);
                     }
                     Console.WriteLine("Enter the number of the correct cd");
                     discNumber = Convert.ToInt32(Console.ReadLine()) -1;
@@ -72,10 +72,13 @@ namespace CdRipper.TestConsole
 
                 using (var trackReader = new TrackReader(drive))
                 {
-                    var output=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), String.Format(@"encoding\track{0:00}.mp3", trackNumber));
                     using (var encoder = new LameMp3Encoder(new EncoderSettings
                     {
-                        OutputFile = output,
+                        Output = new OutputLocation
+                        {
+                            BaseDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
+                            FileNameMask = @"encoding\track-{tracknumber}.mp3"
+                        },
                         Mp3Settings = new Mp3Settings(),
                         Track = discId[discNumber].Tracks.First(s => s.TrackNumber == trackNumber)
                     }))

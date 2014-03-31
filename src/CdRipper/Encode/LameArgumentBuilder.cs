@@ -6,15 +6,15 @@ namespace CdRipper.Encode
 {
     public class LameArgumentBuilder
     {        
-        private string _fileName;
-        private Mp3Settings _mp3Settings;
-        private TrackIdentification _track;
+        private readonly OutputLocation _fileName;
+        private readonly Mp3Settings _mp3Settings;
+        private readonly TrackIdentification _track;
 
         public LameArgumentBuilder(EncoderSettings settings)
         {
             _track = settings.Track ?? TrackIdentification.Default;
-            _fileName = settings.OutputFile ?? "track-" + Path.GetRandomFileName() + ".mp3";
             _mp3Settings = settings.Mp3Settings ?? Mp3Settings.Default;
+            _fileName = settings.Output ?? OutputLocation.Default;
         }
 
         public override string ToString()
@@ -38,9 +38,9 @@ namespace CdRipper.Encode
             AddSwitch(builder, "--tt", _track.Title);
             AddSwitch(builder, "--ta", _track.Artist);
             AddSwitch(builder, "--tg", _track.Genre);
-            AddSwitch(builder, "--tl", _track.Disc.Title);
-            AddSwitch(builder, "--ty", _track.Disc.Year);
-            AddExtraId3Tag(builder, "TPE2", _track.Disc.AlbumArtist); //http://stackoverflow.com/a/5958664/66842
+            AddSwitch(builder, "--tl", _track.AlbumTitle);
+            AddSwitch(builder, "--ty", _track.Year);
+            AddExtraId3Tag(builder, "TPE2", _track.AlbumArtist); //http://stackoverflow.com/a/5958664/66842
             //AddSwitch("--ti", track.Disc.AlbumArtLocation);
             AddTrackNumber(builder, _track);
             return builder;
@@ -58,8 +58,10 @@ namespace CdRipper.Encode
 
         private StringBuilder BuildEndArguments(StringBuilder builder)
         {
+            var fileName = _fileName.CreateFileName(_track);
+
             builder.Append("- "); //input is stin
-            builder.AppendFormat("\"{0}\"", _fileName);
+            builder.AppendFormat("\"{0}\"", fileName);
             return builder;
         }
 
@@ -81,11 +83,11 @@ namespace CdRipper.Encode
 
         private void AddTrackNumber(StringBuilder builder, TrackIdentification track)
         {
-            if (track.TrackNumber > 0 && track.Disc.NumberOfTracks > 0)
+            if (track.TrackNumber > 0 && track.TotalNumberOfTracks > 0)
             {
-                AddSwitch(builder, "--tn", string.Format("{0}/{1}", track.TrackNumber, track.Disc.NumberOfTracks));
+                AddSwitch(builder, "--tn", string.Format("{0}/{1}", track.TrackNumber, track.TotalNumberOfTracks));
             }
-            else if(track.TrackNumber > 0 && track.Disc.NumberOfTracks <= 0)
+            else if(track.TrackNumber > 0 && track.TotalNumberOfTracks <= 0)
             {
                 AddSwitch(builder, "--tn", track.TrackNumber.ToString("N"));
             }

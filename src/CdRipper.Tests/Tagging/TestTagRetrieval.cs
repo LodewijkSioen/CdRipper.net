@@ -18,7 +18,7 @@ namespace CdRipper.Tests.Tagging
             Assert.That(discTags, Is.Not.Null);
             Assert.That(discTags.Count(), Is.EqualTo(1));
             Assert.That(discTags.First().AlbumArtist, Is.EqualTo("Jan De Smet"));
-            Assert.That(discTags.First().Title, Is.EqualTo("Steek Je vinger in de lucht"));
+            Assert.That(discTags.First().AlbumTitle, Is.EqualTo("Steek Je vinger in de lucht"));
             Assert.That(discTags.First().Year, Is.EqualTo("2005"));
             Assert.That(discTags.First().NumberOfTracks, Is.EqualTo(14));
             Assert.That(discTags.First().Tracks.Count(), Is.EqualTo(14));
@@ -41,7 +41,7 @@ namespace CdRipper.Tests.Tagging
             Assert.That(discTags.Count(), Is.EqualTo(1));
 
             Assert.That(discTags.First().AlbumArtist, Is.EqualTo("Ketnet Band"));
-            Assert.That(discTags.First().Title, Is.EqualTo("Appels Eten"));
+            Assert.That(discTags.First().AlbumTitle, Is.EqualTo("Appels Eten"));
             Assert.That(discTags.First().Year, Is.Null);
             Assert.That(discTags.First().NumberOfTracks, Is.EqualTo(3));
             Assert.That(discTags.First().Tracks.Count(), Is.EqualTo(3));

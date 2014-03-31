@@ -6,7 +6,7 @@ namespace CdRipper.Encode
 {
     public class EncoderSettings
     {
-        public string OutputFile { get; set; }
+        public OutputLocation Output { get; set; }
         public TrackIdentification Track { get; set; }
         public Mp3Settings Mp3Settings { get; set; } 
     }

@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DummyData.cs" />
+    <Compile Include="Encode\TestOutputLocation.cs" />
     <Compile Include="Rip\TestTrackReader.cs" />
     <Compile Include="Tagging\TestCdDbCalculator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
