@@ -26,11 +26,7 @@ namespace CdRipper.Encode
         {
             get
             {
-                return new Mp3Settings
-                {
-                    Bitrate = StandardBitrates.kbs192,
-                    Type = BitrateType.Variable
-                };
+                return new Mp3Settings();
             }
         }
 
@@ -59,11 +55,7 @@ namespace CdRipper.Encode
             _lame.StartInfo.FileName = @"lame.exe";
             _lame.StartInfo.UseShellExecute = false;
             _lame.StartInfo.RedirectStandardInput = true;
-            _lame.StartInfo.Arguments = new LameArgumentBuilder()
-                                                .AddFileName(settings.OutputFile)
-                                                .AddTagInformation(settings.Track)
-                                                .AddMp3Settings(settings.Mp3Settings)
-                                                .ToString();
+            _lame.StartInfo.Arguments = new LameArgumentBuilder(settings).ToString();
                 
             _lame.StartInfo.CreateNoWindow = true;
             _lame.Start();            
