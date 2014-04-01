@@ -15,19 +15,19 @@ namespace CdRipper.Tagging
             _api = musicBrainzApi;
         }
 
-        public IEnumerable<DiscIdentification> GetTags(TableOfContents toc)
+        public IEnumerable<AlbumIdentification> GetTags(TableOfContents toc)
         {
             var discId = MusicBrainzDiscIdCalculator.CalculateDiscId(toc);
             return GetTags(discId);
         }
 
-        public IEnumerable<DiscIdentification> GetTags(string discId)
+        public IEnumerable<AlbumIdentification> GetTags(string discId)
         {
             var response = _api.GetReleasesByDiscId(discId);
 
             if (!response.IsFound)
             {
-                return Enumerable.Empty<DiscIdentification>();
+                return Enumerable.Empty<AlbumIdentification>();
             }
 
             if (IsCdStub(response))
@@ -38,11 +38,11 @@ namespace CdRipper.Tagging
             return ParseReleases(response, discId);
         }
 
-        private DiscIdentification ParseCdStub(MusicBrainzResponse response)
+        private AlbumIdentification ParseCdStub(MusicBrainzResponse response)
         {
             var stub = JObject.Parse(response.Json);
 
-            return new DiscIdentification
+            return new AlbumIdentification
             {
                 AlbumTitle = (string)stub["title"],
                 AlbumArtist = (string)stub["artist"],
@@ -60,7 +60,7 @@ namespace CdRipper.Tagging
             };
         }
 
-        private IEnumerable<DiscIdentification> ParseReleases(MusicBrainzResponse response, string discId)
+        private IEnumerable<AlbumIdentification> ParseReleases(MusicBrainzResponse response, string discId)
         {
             foreach (var r in JObject.Parse(response.Json)["releases"])
             {
@@ -73,7 +73,7 @@ namespace CdRipper.Tagging
 
                 var release = JObject.Parse(releaseResponse.Json);
                 var disc = release["media"].First(m => m["discs"].Any(d => (string)d["id"] == discId));
-                var tag = new DiscIdentification
+                var tag = new AlbumIdentification
                 {
                     AlbumArtist = ComposeArtistName(release["artist-credit"]),
                     AlbumTitle = (string)release["title"],
@@ -117,7 +117,7 @@ namespace CdRipper.Tagging
         }
     }
 
-    public class DiscIdentification
+    public class AlbumIdentification
     {
         public IEnumerable<TrackIdentification> Tracks { get; set; }
         public string AlbumArtist { get; set; }

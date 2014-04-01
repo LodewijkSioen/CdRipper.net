@@ -13,8 +13,8 @@ namespace CdRipper.Encode
 
         public OutputLocation()
         {
-            BaseDirectory = Path.GetTempPath();
-            FileNameMask = String.Join(Path.GetTempFileName(), ".mp3");
+            BaseDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic);
+            FileNameMask = "{albumartist}\\{albumtitle}\\{tracknumber}-{title}.m3";
 
             _illegalPathCharacters = Path.GetInvalidFileNameChars().Where(c => c != '\\');
         }
@@ -32,12 +32,15 @@ namespace CdRipper.Encode
                 {"{tracknumber}", track.TrackNumber.ToString("00")},
                 {"{albumartist}", track.AlbumArtist},
                 {"{numberoftracks}", track.TotalNumberOfTracks.ToString("00")},
-                {"{disctitle}", track.AlbumTitle},
+                {"{albumtitle}", track.AlbumTitle},
                 {"{year}", track.Year}
             };
             foreach (var character in Path.GetInvalidFileNameChars())
             {
-                replacements.Add(character.ToString(), string.Empty);
+                if (character != Path.DirectorySeparatorChar && character != Path.AltDirectorySeparatorChar)
+                {
+                    replacements.Add(character.ToString(), string.Empty);
+                }
             }
 
             var fileName = CaseInsentiveReplace(FileNameMask,  replacements);
@@ -56,7 +59,7 @@ namespace CdRipper.Encode
         private string CaseInsentiveReplace(string input, IEnumerable<KeyValuePair<string, string>> replaceValues)
         {
             return replaceValues.Aggregate(input, (current, replaceValue) => 
-                Regex.Replace(current, Regex.Escape(replaceValue.Key), Regex.Escape(replaceValue.Value ?? string.Empty), RegexOptions.IgnoreCase));
+                Regex.Replace(current, Regex.Escape(replaceValue.Key), replaceValue.Value ?? string.Empty, RegexOptions.IgnoreCase));
         }
     }
 }

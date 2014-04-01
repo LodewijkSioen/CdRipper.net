@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using CdRipper.Tagging;
 
 namespace CdRipper.Encode
@@ -50,7 +51,13 @@ namespace CdRipper.Encode
         private Process _lame;
 
         public LameMp3Encoder(EncoderSettings settings)
-        {   
+        {
+            var directory = new DirectoryInfo(Path.GetDirectoryName(settings.Output.CreateFileName(settings.Track)));
+            if (!directory.Exists)
+            {
+                directory.Create();
+            }
+
             _lame = new Process();
             _lame.StartInfo.FileName = @"lame.exe";
             _lame.StartInfo.UseShellExecute = false;

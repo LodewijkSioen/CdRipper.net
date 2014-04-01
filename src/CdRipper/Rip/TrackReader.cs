@@ -58,9 +58,12 @@ namespace CdRipper.Rip
 
         public void Dispose()
         {
-            if (_isLocked)
+            if (_drive != null)
             {
-                _isLocked = !_drive.UnLock().Result;
+                if (_isLocked)
+                {
+                    _isLocked = !_drive.UnLock().Result;
+                }
             }
             _drive = null;
         }

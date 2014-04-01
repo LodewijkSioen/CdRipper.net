@@ -77,14 +77,14 @@ namespace CdRipper.TestConsole
                         Output = new OutputLocation
                         {
                             BaseDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
-                            FileNameMask = @"encoding\track-{tracknumber}.mp3"
+                            FileNameMask = @"encoding\{albumartist}\{albumtitle}\{tracknumber}-{title}.mp3"
                         },
                         Mp3Settings = new Mp3Settings(),
                         Track = discId[discNumber].Tracks.First(s => s.TrackNumber == trackNumber)
                     }))
                     {
                         var cts = new CancellationTokenSource();
-                        cts.CancelAfter(3000);
+                        
                         var track = toc.Tracks.First(t => t.TrackNumber == trackNumber);
                         await trackReader.ReadTrack(track.Offset, track.Sectors,
                             b =>

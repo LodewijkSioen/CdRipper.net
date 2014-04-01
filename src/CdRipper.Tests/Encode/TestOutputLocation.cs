@@ -13,7 +13,7 @@ namespace CdRipper.Tests.Encode
             var output = new OutputLocation
             {
                 BaseDirectory = @"c:\test",
-                FileNameMask = "track-{title}-{artist}-{tracknumber}-{genre}-{disctitle}-{albumartist}-{numberoftracks}-{year}.mp3"
+                FileNameMask = @"track\{title}\{artist}-{tracknumber}\{genre}-{albumtitle}.{albumartist}-{numberoftracks}-{year}.mp3"
             };
 
             var filename = output.CreateFileName(new TrackIdentification
@@ -22,13 +22,13 @@ namespace CdRipper.Tests.Encode
                 Artist = "artist",
                 TrackNumber = 4,
                 Genre = "genre",
-                AlbumTitle = "disctitle",
-                AlbumArtist = "albumartist",
+                AlbumTitle = "album title",
+                AlbumArtist = "album artist",
                 TotalNumberOfTracks = 25,
                 Year = "1854"
             });
 
-            Assert.That(filename, Is.EqualTo(@"c:\test\track-title-artist-04-genre-disctitle-albumartist-25-1854.mp3"));
+            Assert.That(filename, Is.EqualTo(@"c:\test\track\title\artist-04\genre-album title.album artist-25-1854.mp3"));
         }
 
         [Test]
@@ -37,7 +37,7 @@ namespace CdRipper.Tests.Encode
             var output = new OutputLocation
             {
                 BaseDirectory = @"c:\test",
-                FileNameMask = "track-{title}-{disctitle}.mp3"
+                FileNameMask = "track-{title}-{albumtitle}.mp3"
             };
 
             var filename = output.CreateFileName(new TrackIdentification());
@@ -51,13 +51,13 @@ namespace CdRipper.Tests.Encode
             var output = new OutputLocation
             {
                 BaseDirectory = @"c:\test",
-                FileNameMask = @"tr//*/??
+                FileNameMask = @"tr*??//
 ack.mp3"
             };
 
             var filename = output.CreateFileName(new TrackIdentification());
 
-            Assert.That(filename, Is.EqualTo(@"c:\test\track.mp3"));
+            Assert.That(filename, Is.EqualTo(@"c:\test\tr//ack.mp3"));
 
         }
     }
