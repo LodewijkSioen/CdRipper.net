@@ -16,6 +16,38 @@ namespace CdRipper.Tests
     public static class DummyData
     {
         /// <summary>
+        /// Pregap track <see cref="http://wiki.musicbrainz.org/ReleasesWithPregapTracks"/> and some wierd stuff at the end
+        /// </summary>
+        public static DummyCd MuchAgainstEveryonesAdvice
+        {
+            get
+            {
+                return new DummyCd
+                {
+                    TableOfContents = new TableOfContents(new[]
+                    {
+                        new Track(1,  4462  , 13998),
+                        new Track(2,  18460 , 14337),
+                        new Track(3,  32797 , 15715),
+                        new Track(4,  48512 , 12620),
+                        new Track(5,  61132 , 9313 ),
+                        new Track(6,  70445 , 20057),
+                        new Track(7,  90502 , 12168),
+                        new Track(8,  102670, 17097),
+                        new Track(9,  119767, 19490),
+                        new Track(10, 139257, 18790),
+                        new Track(11, 158047, 11568),
+                        new Track(12, 169615, 19795),
+                        new Track(13, 189410, 16427),
+                        new Track(14, 205837, 20543), 
+                    }),
+                    MusicBrainzDiscId = "s3I6bSQb4qj2otl9xj8YpCBZeI0-",
+                    MusicBrainzReleaseId = "6d283259-8c9a-3558-9acc-d6c2e429c657",
+                };
+            }
+        }
+
+        /// <summary>
         /// This disc returns a CdStub <see cref="http://musicbrainz.org/doc/CD_Stub"/>
         /// </summary>
         public static DummyCd AppelsEten

@@ -11,7 +11,7 @@ namespace CdRipper.Tests
         [Test, Explicit]
         public void TestDummyData()
         {
-            var dummyToc = DummyData.SteekJeVingerInDeLucht.TableOfContents;
+            var dummyToc = DummyData.MuchAgainstEveryonesAdvice.TableOfContents;
 
             using (var drive = CdDrive.Create("f"))
             {
@@ -22,10 +22,10 @@ namespace CdRipper.Tests
                     var realTrack = realToc.Tracks[i];
                     var dummyTrack = dummyToc.Tracks[i];
 
-                    Assert.That(realTrack.TrackNumber, Is.EqualTo(dummyTrack.TrackNumber), "Tracknumber " + i);
-                    Assert.That(realTrack.Offset, Is.EqualTo(dummyTrack.Offset), "Startsector " + i);
-                    Assert.That(realTrack.Sectors, Is.EqualTo(dummyTrack.Sectors), "EndSector " + i);
-                    Assert.That(realTrack.Length, Is.EqualTo(dummyTrack.Length), "length " + i);
+                    Assert.That(realTrack.TrackNumber, Is.EqualTo(dummyTrack.TrackNumber), "Tracknumber");
+                    Assert.That(realTrack.Offset, Is.EqualTo(dummyTrack.Offset), "Offset of track " + realTrack.TrackNumber);
+                    Assert.That(realTrack.Sectors, Is.EqualTo(dummyTrack.Sectors), "Sectors of track " + realTrack.TrackNumber);
+                    Assert.That(realTrack.Length, Is.EqualTo(dummyTrack.Length), "Length of track " + realTrack.TrackNumber);
                 }
             }
         }
@@ -40,7 +40,7 @@ namespace CdRipper.Tests
                 {
                     Console.WriteLine("new Track({0}, {1}, {2}),", track.TrackNumber, track.Offset, track.Sectors);
                 }
-                Console.WriteLine("DiscId: " + MusicBrainzDiscIdCalculator.CalculateDiscId(toc));
+                Console.WriteLine("MusicBrainzDiscId= " + MusicBrainzDiscIdCalculator.CalculateDiscId(toc));
             }
         }
     }

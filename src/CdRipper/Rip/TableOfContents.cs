@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace CdRipper.Rip
 {
     public class TableOfContents
     {
+        private const int Leadout = ((60 + 90 + 2) * 75); //https://github.com/metabrainz/libdiscid/blob/master/src/toc.c This has some wierd stuff in it..
         public IList<Track> Tracks { get; private set; }
 
         public TableOfContents(IList<Track> tracks)
@@ -19,17 +19,20 @@ namespace CdRipper.Rip
             {
                 if (toc.TrackData[i].Control == 0)
                 {
+                    var trackNumber = toc.TrackData[i].TrackNumber;
                     var offset = GetStartSector(toc.TrackData[i]);
-                    var sectors = GetStartSector(toc.TrackData[i + 1]) - offset;
 
-                    yield return new Track(toc.TrackData[i].TrackNumber, offset, sectors);    
+                    var nextTrack = toc.TrackData[i + 1];
+                    var sectors = GetStartSector(nextTrack) - offset;
+
+                    yield return new Track(trackNumber, offset, sectors);    
                 }
             }
         }
 
         private static int GetStartSector(Win32Functions.TRACK_DATA data)
         {
-            return (data.Address_1 * 60 * 75 + data.Address_2 * 75 + data.Address_3);
+            return (data.Address_1*60*75 + data.Address_2*75 + data.Address_3) - (data.Control == 0 ? 0 : Leadout);
         }
 
         internal static TableOfContents Create(Win32Functions.CDROM_TOC toc)

@@ -149,6 +149,7 @@ namespace CdRipper
     {
       [MarshalAs(UnmanagedType.ByValArray, SizeConst=MAXIMUM_NUMBER_TRACKS*8)]
       private byte[] Data;
+
       public TRACK_DATA this [int Index]
       {
         get
@@ -172,6 +173,7 @@ namespace CdRipper
           return res;
         }
       }
+
       public TrackDataList()
       {
         Data = new byte[MAXIMUM_NUMBER_TRACKS*Marshal.SizeOf(typeof(TRACK_DATA))];

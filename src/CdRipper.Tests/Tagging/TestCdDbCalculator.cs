@@ -23,6 +23,10 @@ namespace CdRipper.Tests.Tagging
             yield return new TestCaseData(DummyData.SteekJeVingerInDeLucht.TableOfContents)
                 .SetName("Steek je vinger in de lucht")
                 .Returns(DummyData.SteekJeVingerInDeLucht.MusicBrainzDiscId);
+
+            yield return new TestCaseData(DummyData.MuchAgainstEveryonesAdvice.TableOfContents)
+                .SetName("Much Against Everyone's Advice")
+                .Returns(DummyData.MuchAgainstEveryonesAdvice.MusicBrainzDiscId);
         }
 
         [TestCaseSource("GetTestCdDb"), Explicit("Still Failing")]
