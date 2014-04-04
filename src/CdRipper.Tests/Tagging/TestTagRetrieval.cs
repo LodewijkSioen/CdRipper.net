@@ -63,7 +63,20 @@ namespace CdRipper.Tests.Tagging
 
             var discTags = tagSource.GetTags(DummyData.UnknownCd.TableOfContents).ToList();
 
-            Assert.That(discTags.Any(), Is.False);
+            Assert.That(discTags.Count, Is.EqualTo(1));
+            Assert.That(discTags.First().AlbumArtist, Is.EqualTo("Unknown Artist"));
+            Assert.That(discTags.First().AlbumTitle, Is.EqualTo("Unknown Album"));
+            Assert.That(discTags.First().Year, Is.Null);
+            Assert.That(discTags.First().NumberOfTracks, Is.EqualTo(2));
+            Assert.That(discTags.First().Tracks.Count(), Is.EqualTo(2));
+            Assert.That(discTags.First().Tracks.ElementAt(0).Title, Is.EqualTo("Unknown Title"));
+            Assert.That(discTags.First().Tracks.ElementAt(0).Artist, Is.EqualTo("Unknown Artist"));
+            Assert.That(discTags.First().Tracks.ElementAt(0).TrackNumber, Is.EqualTo(1));
+            Assert.That(discTags.First().Tracks.ElementAt(0).TotalNumberOfTracks, Is.EqualTo(2));
+            Assert.That(discTags.First().Tracks.ElementAt(1).Title, Is.EqualTo("Unknown Title"));
+            Assert.That(discTags.First().Tracks.ElementAt(1).Artist, Is.EqualTo("Unknown Artist"));
+            Assert.That(discTags.First().Tracks.ElementAt(1).TrackNumber, Is.EqualTo(2));
+            Assert.That(discTags.First().Tracks.ElementAt(1).TotalNumberOfTracks, Is.EqualTo(2));
         }
 
         [Test, Explicit]

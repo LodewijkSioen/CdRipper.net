@@ -12,7 +12,7 @@ namespace CdRipper.Encode
 
         public LameArgumentBuilder(EncoderSettings settings)
         {
-            _track = settings.Track ?? TrackIdentification.Default;
+            _track = settings.Track ?? TrackIdentification.GetEmpty();
             _mp3Settings = settings.Mp3Settings ?? Mp3Settings.Default;
             _fileName = settings.Output ?? OutputLocation.Default;
         }

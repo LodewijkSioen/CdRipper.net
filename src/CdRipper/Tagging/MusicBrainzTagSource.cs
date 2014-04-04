@@ -6,7 +6,12 @@ using System.Linq;
 
 namespace CdRipper.Tagging
 {    
-    public class MusicBrainzTagSource
+    public interface ITagSource
+    {
+        IEnumerable<AlbumIdentification> GetTags(TableOfContents toc);
+    }
+
+    public class MusicBrainzTagSource : ITagSource
     {
         private readonly IIMusicBrainzApi _api;
 
@@ -23,7 +28,7 @@ namespace CdRipper.Tagging
 
             if (!response.IsFound)
             {
-                return Enumerable.Empty<AlbumIdentification>();
+                return new []{ AlbumIdentification.GetEmpty(toc.Tracks.Count())};
             }
 
             if (IsCdStub(response))
@@ -120,6 +125,19 @@ namespace CdRipper.Tagging
         public string AlbumTitle { get; set; }
         public int NumberOfTracks { get; set; }
         public string Year { get; set; }
+
+        public static AlbumIdentification GetEmpty(int numberOfTracks)
+        {
+            return new AlbumIdentification
+            {
+                AlbumArtist = "Unknown Artist",
+                AlbumTitle = "Unknown Album",
+                NumberOfTracks = numberOfTracks,
+                Tracks = (from trackNum in Enumerable.Range(1, numberOfTracks)
+                          select TrackIdentification.GetEmpty(trackNum, numberOfTracks)).ToList()
+            };
+         
+        }
     }
 
     public class TrackIdentification
@@ -134,17 +152,16 @@ namespace CdRipper.Tagging
         public string Year { get; set; }
         public int TotalNumberOfTracks { get; set; }
 
-        public static TrackIdentification Default
+        public static TrackIdentification GetEmpty(int trackNumber = 0, int totalNumberOfTracks = 0)
         {
-            get
+            return new TrackIdentification
             {
-                return new TrackIdentification
-                {
-                    Artist = "Unknow Artist",
-                    AlbumArtist = "Unkown Artist",
-                    Title = "Unknown Title"
-                };
-            }
+                Artist = "Unknown Artist",
+                AlbumArtist = "Unknown Artist",
+                Title = "Unknown Title",
+                TrackNumber = trackNumber,
+                TotalNumberOfTracks = totalNumberOfTracks
+            };
         }
     }
 }
