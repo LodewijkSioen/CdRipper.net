@@ -15,6 +15,20 @@ namespace CdRipper.Tests
 
     public static class DummyData
     {
+        public static DummyCd UnknownCd
+        {
+            get
+            {
+                return new DummyCd
+                {
+                    TableOfContents = new TableOfContents(new[]{
+                        new Track(1, 150, 2000),
+                        new Track(1, 2150, 4000),
+                    })
+                };
+            }
+        }
+
         /// <summary>
         /// Pregap track <see cref="http://wiki.musicbrainz.org/ReleasesWithPregapTracks"/> and some wierd stuff at the end
         /// </summary>

@@ -18,11 +18,7 @@ namespace CdRipper.Tagging
         public IEnumerable<AlbumIdentification> GetTags(TableOfContents toc)
         {
             var discId = MusicBrainzDiscIdCalculator.CalculateDiscId(toc);
-            return GetTags(discId);
-        }
-
-        public IEnumerable<AlbumIdentification> GetTags(string discId)
-        {
+            
             var response = _api.GetReleasesByDiscId(discId);
 
             if (!response.IsFound)

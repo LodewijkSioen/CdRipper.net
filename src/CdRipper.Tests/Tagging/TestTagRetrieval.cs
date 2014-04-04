@@ -13,7 +13,7 @@ namespace CdRipper.Tests.Tagging
         {
             var tagSource = new MusicBrainzTagSource(new MockMusicBrainzApi());
 
-            var discTags = tagSource.GetTags(DummyData.SteekJeVingerInDeLucht.MusicBrainzDiscId).ToList();
+            var discTags = tagSource.GetTags(DummyData.SteekJeVingerInDeLucht.TableOfContents).ToList();
 
             Assert.That(discTags, Is.Not.Null);
             Assert.That(discTags.Count(), Is.EqualTo(1));
@@ -35,7 +35,7 @@ namespace CdRipper.Tests.Tagging
         {
             var tagSource = new MusicBrainzTagSource(new MockMusicBrainzApi());
 
-            var discTags = tagSource.GetTags(DummyData.AppelsEten.MusicBrainzDiscId).ToList();
+            var discTags = tagSource.GetTags(DummyData.AppelsEten.TableOfContents).ToList();
 
             Assert.That(discTags, Is.Not.Null);
             Assert.That(discTags.Count(), Is.EqualTo(1));
@@ -61,7 +61,7 @@ namespace CdRipper.Tests.Tagging
         {
             var tagSource = new MusicBrainzTagSource(new MockMusicBrainzApi());
 
-            var discTags = tagSource.GetTags("NotFound").ToList();
+            var discTags = tagSource.GetTags(DummyData.UnknownCd.TableOfContents).ToList();
 
             Assert.That(discTags.Any(), Is.False);
         }
@@ -102,7 +102,7 @@ namespace CdRipper.Tests.Tagging
 
         public MusicBrainzResponse GetReleasesByDiscId(string discId)
         {
-            return discId == "NotFound" ? new MusicBrainzResponse(false, null) : new MusicBrainzResponse(true, _releasesForDiscId[discId]);
+            return _releasesForDiscId.ContainsKey(discId) ? new MusicBrainzResponse(true, _releasesForDiscId[discId]) : new MusicBrainzResponse(false, null);
         }
 
         public MusicBrainzResponse GetRelease(string releaseId)
