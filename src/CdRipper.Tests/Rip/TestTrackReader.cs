@@ -42,7 +42,6 @@ namespace CdRipper.Tests.Rip
         public IList<int> StartSectors = new List<int>();
         public IList<int> NumberOfSectors = new List<int>();
 
-
         public DummyDrive(TableOfContents toc)
         {
             _toc = toc;
@@ -84,6 +83,11 @@ namespace CdRipper.Tests.Rip
         public async Task<bool> UnLock()
         {
             return await Task.Run(() =>true);
+        }
+
+        public async Task<bool> Eject()
+        {
+            return await Task.Run(() => true);
         }
     }
 }

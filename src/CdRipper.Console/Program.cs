@@ -28,7 +28,7 @@ namespace CdRipper.TestConsole
                 {
                     Console.WriteLine(e.Message);
                 }
-            }
+            }            
         }
 
         static async Task RipWithMusicBrainz(string driveletter)
@@ -97,6 +97,7 @@ namespace CdRipper.TestConsole
                             }, cts.Token);
                     }
                 }
+                await drive.Eject();
             }
         }
     }

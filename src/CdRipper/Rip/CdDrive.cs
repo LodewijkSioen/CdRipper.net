@@ -10,6 +10,7 @@ namespace CdRipper.Rip
         Task<bool> IsCdInDrive();
         Task<TableOfContents> ReadTableOfContents();
         Task<byte[]> ReadSector(int startSector, int numberOfSectors);
+        Task<bool> Eject();
         Task<bool> Lock();
         Task<bool> UnLock();
     }
@@ -124,6 +125,15 @@ namespace CdRipper.Rip
                 uint dummy = 0;
                 var pmr = new Win32Functions.PREVENT_MEDIA_REMOVAL { PreventMediaRemoval = 0 };
                 return Win32Functions.DeviceIoControl(_driveHandle, Win32Functions.IOCTL_STORAGE_MEDIA_REMOVAL, pmr, (uint)Marshal.SizeOf(pmr), IntPtr.Zero, 0, ref dummy, IntPtr.Zero) == 0;
+            });
+        }
+
+        public async Task<bool> Eject()
+        {
+            return await Task.Run(() =>
+            {
+                uint Dummy = 0;
+                return Win32Functions.DeviceIoControl(_driveHandle, Win32Functions.IOCTL_STORAGE_EJECT_MEDIA, IntPtr.Zero, 0, IntPtr.Zero, 0, ref Dummy, IntPtr.Zero) != 0;
             });
         }
 
