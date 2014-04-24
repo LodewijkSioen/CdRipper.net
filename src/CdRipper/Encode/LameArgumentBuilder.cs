@@ -1,4 +1,4 @@
-﻿using System.IO;
+﻿using System.Linq;
 using System.Text;
 using CdRipper.Tagging;
 
@@ -12,7 +12,7 @@ namespace CdRipper.Encode
 
         public LameArgumentBuilder(EncoderSettings settings)
         {
-            _track = settings.Track ?? TrackIdentification.GetEmpty();
+            _track = settings.Track ?? AlbumIdentification.GetEmpty(1).Tracks.First();
             _mp3Settings = settings.Mp3Settings ?? Mp3Settings.Default;
             _fileName = settings.Output ?? OutputLocation.Default;
         }

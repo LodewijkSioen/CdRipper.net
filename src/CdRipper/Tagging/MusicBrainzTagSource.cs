@@ -43,22 +43,26 @@ namespace CdRipper.Tagging
         {
             var stub = JObject.Parse(response.Json);
 
-            return new AlbumIdentification
+            var tag = new AlbumIdentification
             {
+                Id = (string)stub["id"],
                 AlbumTitle = (string)stub["title"],
                 AlbumArtist = (string)stub["artist"],
                 NumberOfTracks = (int?)stub["track-count"] ?? stub["tracks"].Count(),
-                Tracks = stub["tracks"].Select((t, index) => 
-                         new TrackIdentification
+            };
+
+            for (int index = 0; index < stub["tracks"].Count(); index++)
+            {
+                var t = stub["tracks"][index];
+                tag.AddTrack(new TrackIdentification()
                          {
                              Artist = (string)t["artist"],
                              Title = (string)t["title"],
-                             TrackNumber = index +1,
-                             AlbumTitle = (string)stub["title"],
-                             AlbumArtist = (string)stub["artist"],
-                             TotalNumberOfTracks = (int?)stub["track-count"] ?? stub["tracks"].Count(),
-                         })
-            };
+                             TrackNumber = index +1
+                         });
+            }
+
+            return tag;
         }
 
         private IEnumerable<AlbumIdentification> ParseReleases(MusicBrainzResponse response, string discId)
@@ -76,23 +80,23 @@ namespace CdRipper.Tagging
                 var disc = release["media"].First(m => m["discs"].Any(d => (string)d["id"] == discId));
                 var tag = new AlbumIdentification
                 {
+                    Id = (string)release["id"],
                     AlbumArtist = ComposeArtistName(release["artist-credit"]),
                     AlbumTitle = (string)release["title"],
                     NumberOfTracks = (int) disc["track-count"],
-                    Year = (string) release["date"],
-                    Tracks = from t in disc["tracks"]
-                        select new TrackIdentification
+                    Year = (string) release["date"]
+                };
+
+                foreach (var t in disc["tracks"])
+                {
+                    tag.AddTrack(new TrackIdentification()
                         {
                             Title = (string) t["title"],
                             Artist = ComposeArtistName(release["artist-credit"]),
                             TrackNumber = (int) t["number"],
                             //Genre = (string)t[""], //MusicBrainz doesn't implement genres yet: https://musicbrainz.org/doc/General_FAQ#Why_does_MusicBrainz_not_support_genre_information.3F
-                            AlbumArtist = ComposeArtistName(release["artist-credit"]),
-                            AlbumTitle = (string) release["title"],
-                            TotalNumberOfTracks = (int) disc["track-count"],
-                            Year = (string) release["date"]
-                        }
-                };
+                        });
+                }       
 
                 yield return tag;
             }
@@ -115,53 +119,6 @@ namespace CdRipper.Tagging
             }
 
             return artistBuilder.ToString();
-        }
-    }
-
-    public class AlbumIdentification
-    {
-        public IEnumerable<TrackIdentification> Tracks { get; set; }
-        public string AlbumArtist { get; set; }
-        public string AlbumTitle { get; set; }
-        public int NumberOfTracks { get; set; }
-        public string Year { get; set; }
-
-        public static AlbumIdentification GetEmpty(int numberOfTracks)
-        {
-            return new AlbumIdentification
-            {
-                AlbumArtist = "Unknown Artist",
-                AlbumTitle = "Unknown Album",
-                NumberOfTracks = numberOfTracks,
-                Tracks = (from trackNum in Enumerable.Range(1, numberOfTracks)
-                          select TrackIdentification.GetEmpty(trackNum, numberOfTracks)).ToList()
-            };
-         
-        }
-    }
-
-    public class TrackIdentification
-    {
-        public string Artist { get; set; }
-        public string Title { get; set; }
-        public int TrackNumber { get; set; }
-        public string Genre { get; set; }
-        
-        public string AlbumArtist { get; set; }
-        public string AlbumTitle { get; set; }
-        public string Year { get; set; }
-        public int TotalNumberOfTracks { get; set; }
-
-        public static TrackIdentification GetEmpty(int trackNumber = 0, int totalNumberOfTracks = 0)
-        {
-            return new TrackIdentification
-            {
-                Artist = "Unknown Artist",
-                AlbumArtist = "Unknown Artist",
-                Title = "Unknown Title",
-                TrackNumber = trackNumber,
-                TotalNumberOfTracks = totalNumberOfTracks
-            };
         }
     }
 }

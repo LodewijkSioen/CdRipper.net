@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="Encode\LameArgumentBuilder.cs" />
     <Compile Include="Encode\OutputLocation.cs" />
+    <Compile Include="Tagging\AlbumIdentification.cs" />
     <Compile Include="Tagging\MusicBrainzApi.cs" />
     <Compile Include="Tagging\MusicBrainzDiscIdCalculator.cs" />
     <Compile Include="Tagging\FreeDbDiscIdCalculator.cs" />
@@ -55,6 +56,7 @@
     <Compile Include="Rip\Track.cs" />
     <Compile Include="Rip\TrackReader.cs" />
     <Compile Include="Tagging\MusicBrainzTagSource.cs" />
+    <Compile Include="Tagging\TrackIdentification.cs" />
     <Compile Include="Win32Functions.cs" />
   </ItemGroup>
   <ItemGroup>

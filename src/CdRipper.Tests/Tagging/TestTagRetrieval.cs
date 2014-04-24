@@ -17,6 +17,7 @@ namespace CdRipper.Tests.Tagging
 
             Assert.That(discTags, Is.Not.Null);
             Assert.That(discTags.Count(), Is.EqualTo(1));
+            Assert.That(discTags.First().Id, Is.EqualTo(DummyData.SteekJeVingerInDeLucht.MusicBrainzReleases.Keys.First()));
             Assert.That(discTags.First().AlbumArtist, Is.EqualTo("Jan De Smet"));
             Assert.That(discTags.First().AlbumTitle, Is.EqualTo("Steek Je vinger in de lucht"));
             Assert.That(discTags.First().Year, Is.EqualTo("2005"));
@@ -40,20 +41,19 @@ namespace CdRipper.Tests.Tagging
             Assert.That(discTags, Is.Not.Null);
             Assert.That(discTags.Count(), Is.EqualTo(1));
 
-            Assert.That(discTags.First().AlbumArtist, Is.EqualTo("Ketnet Band"));
-            Assert.That(discTags.First().AlbumTitle, Is.EqualTo("Appels Eten"));
-            Assert.That(discTags.First().Year, Is.Null);
-            Assert.That(discTags.First().NumberOfTracks, Is.EqualTo(3));
-            Assert.That(discTags.First().Tracks.Count(), Is.EqualTo(3));
-            Assert.That(discTags.First().Tracks.ElementAt(0).Title, Is.EqualTo("Appels Eten q2"));
-            Assert.That(discTags.First().Tracks.ElementAt(0).Artist, Is.Null);
-            Assert.That(discTags.First().Tracks.ElementAt(0).TrackNumber, Is.EqualTo(1));
-            Assert.That(discTags.First().Tracks.ElementAt(1).Title, Is.EqualTo("Appels Eten Instrumental q2"));
-            Assert.That(discTags.First().Tracks.ElementAt(1).Artist, Is.Null);
-            Assert.That(discTags.First().Tracks.ElementAt(1).TrackNumber, Is.EqualTo(2));
-            Assert.That(discTags.First().Tracks.ElementAt(2).Title, Is.EqualTo("Appels Eten PB q2"));
-            Assert.That(discTags.First().Tracks.ElementAt(2).Artist, Is.Null);
-            Assert.That(discTags.First().Tracks.ElementAt(2).TrackNumber, Is.EqualTo(3));
+            var expectedAlbum = new AlbumIdentification
+            {
+                Id = "S0liNSPBm5gjOHw9JtmPPDhXynI-", //Stub has a special Id
+                AlbumArtist = "Ketnet Band",
+                AlbumTitle = "Appels Eten",
+                Year = null,
+                NumberOfTracks = 3
+            };
+            expectedAlbum.AddTrack(new TrackIdentification { Title = "Appels Eten q2", TrackNumber = 1 });
+            expectedAlbum.AddTrack(new TrackIdentification { Title = "Appels Eten Instrumental q2", TrackNumber = 2 });
+            expectedAlbum.AddTrack(new TrackIdentification { Title = "Appels Eten PB q2", TrackNumber = 3 });
+
+            AssertAlbum(discTags.First(), expectedAlbum);
         }
 
         [Test]
@@ -64,33 +64,68 @@ namespace CdRipper.Tests.Tagging
             var discTags = tagSource.GetTags(DummyData.UnknownCd.TableOfContents).ToList();
 
             Assert.That(discTags.Count, Is.EqualTo(1));
-            Assert.That(discTags.First().AlbumArtist, Is.EqualTo("Unknown Artist"));
-            Assert.That(discTags.First().AlbumTitle, Is.EqualTo("Unknown Album"));
-            Assert.That(discTags.First().Year, Is.Null);
-            Assert.That(discTags.First().NumberOfTracks, Is.EqualTo(2));
-            Assert.That(discTags.First().Tracks.Count(), Is.EqualTo(2));
-            Assert.That(discTags.First().Tracks.ElementAt(0).Title, Is.EqualTo("Unknown Title"));
-            Assert.That(discTags.First().Tracks.ElementAt(0).Artist, Is.EqualTo("Unknown Artist"));
-            Assert.That(discTags.First().Tracks.ElementAt(0).TrackNumber, Is.EqualTo(1));
-            Assert.That(discTags.First().Tracks.ElementAt(0).TotalNumberOfTracks, Is.EqualTo(2));
-            Assert.That(discTags.First().Tracks.ElementAt(1).Title, Is.EqualTo("Unknown Title"));
-            Assert.That(discTags.First().Tracks.ElementAt(1).Artist, Is.EqualTo("Unknown Artist"));
-            Assert.That(discTags.First().Tracks.ElementAt(1).TrackNumber, Is.EqualTo(2));
-            Assert.That(discTags.First().Tracks.ElementAt(1).TotalNumberOfTracks, Is.EqualTo(2));
+            AssertAlbum(discTags.First(), AlbumIdentification.GetEmpty(2));
+        }
+
+        [Test]
+        public void TestGettingInfoForACdWithMultipleResults()
+        {
+            var tagSource = new MusicBrainzTagSource(new MockMusicBrainzApi());
+
+            var discTags = tagSource.GetTags(DummyData.MuchAgainstEveryonesAdvice.TableOfContents).ToList();
+
+            Assert.That(discTags.Count, Is.EqualTo(3));
+
+            Assert.That(discTags.ElementAt(0).Id, Is.EqualTo("6d283259-8c9a-3558-9acc-d6c2e429c657"));
+            Assert.That(discTags.ElementAt(1).Id, Is.EqualTo("7cf38b3b-d110-318a-ae18-1d4078c347ce"));
+            Assert.That(discTags.ElementAt(2).Id, Is.EqualTo("d939579c-cd40-4dd7-8927-8030f7932cbc"));
+        }
+
+        private void AssertAlbum(AlbumIdentification actual, AlbumIdentification expected)
+        {
+            Assert.That(actual.Id, Is.EqualTo(expected.Id), "AlbumId");
+            Assert.That(actual.AlbumArtist, Is.EqualTo(actual.AlbumArtist), "AlbumArtist");
+            Assert.That(actual.AlbumTitle, Is.EqualTo(actual.AlbumTitle), "AlbumTitle");
+            Assert.That(actual.Year, Is.EqualTo(actual.Year), "Year");
+            Assert.That(actual.NumberOfTracks, Is.EqualTo(expected.NumberOfTracks), "NumberOfTracks");
+            Assert.That(actual.Tracks.Count(), Is.EqualTo(expected.Tracks.Count()), "Count of tracks on the album");
+            for (int i = 0; i < expected.Tracks.Count(); i++)
+            {
+                var expectedTrack = expected.Tracks.ElementAt(i);
+                var actualTrack = actual.Tracks.ElementAt(i);
+                AssertTrack(actualTrack, expectedTrack);
+            }
+        }
+
+        private void AssertTrack(TrackIdentification actualTrack, TrackIdentification expectedTrack)
+        {
+            Assert.That(actualTrack.Genre, Is.Null, "Genre is not yet implemented");
+
+            Assert.That(actualTrack.Title, Is.EqualTo(expectedTrack.Title), "Title");
+            Assert.That(actualTrack.Artist, Is.EqualTo(expectedTrack.Artist), "Artist");
+            Assert.That(actualTrack.TrackNumber, Is.EqualTo(expectedTrack.TrackNumber), "TrackNumber");
+            Assert.That(actualTrack.AlbumArtist, Is.EqualTo(expectedTrack.AlbumArtist), "AlbumArtist on track");
+            Assert.That(actualTrack.AlbumTitle, Is.EqualTo(expectedTrack.AlbumTitle), "AlbumTitle on track");
+            Assert.That(actualTrack.Year, Is.EqualTo(expectedTrack.Year), "Year on track");
+            Assert.That(actualTrack.TotalNumberOfTracks, Is.EqualTo(expectedTrack.TotalNumberOfTracks), "TotalNumberOfTracks on track");
         }
 
         [Test, Explicit]
-        public void TestDummyData()
+        public void GetDummyDataFromMusicBrainz()
         {
-            var dummyCd = DummyData.AppelsEten;
-
+            var cd = DummyData.MuchAgainstEveryonesAdvice;
             var api = new MusicBrainzApi("http://musicbrainz.org/");
-            var mockedApi = new MockMusicBrainzApi();
 
-            Assert.That(api.GetReleasesByDiscId(dummyCd.MusicBrainzDiscId), Is.EqualTo(mockedApi.GetReleasesByDiscId(dummyCd.MusicBrainzDiscId)));
-            if (dummyCd.MusicBrainzReleaseId != null)
+            var discIdResponse = api.GetReleasesByDiscId(MusicBrainzDiscIdCalculator.CalculateDiscId(cd.TableOfContents));
+            Assert.That(discIdResponse.Json, Is.EqualTo(cd.GetReleaseByDiscIdResponse), discIdResponse.Json.Replace(@"""", @"\"""));
+
+            if (cd.MusicBrainzReleases != null)
             {
-                Assert.That(api.GetRelease(dummyCd.MusicBrainzReleaseId), Is.EqualTo(mockedApi.GetRelease(dummyCd.MusicBrainzReleaseId)));
+                foreach (var release in cd.MusicBrainzReleases)
+                {
+                    var releaseResponse = api.GetRelease(release.Key);
+                    Assert.That(releaseResponse.Json, Is.EqualTo(release.Value), releaseResponse.Json.Replace(@"""", @"\"""));
+                }
             }
         }
     }
@@ -105,12 +140,12 @@ namespace CdRipper.Tests.Tagging
             _releasesForDiscId = new Dictionary<string, string>
             {
                 {DummyData.SteekJeVingerInDeLucht.MusicBrainzDiscId, DummyData.SteekJeVingerInDeLucht.GetReleaseByDiscIdResponse},
-                {DummyData.AppelsEten.MusicBrainzDiscId, DummyData.AppelsEten.GetReleaseByDiscIdResponse}
+                {DummyData.AppelsEten.MusicBrainzDiscId, DummyData.AppelsEten.GetReleaseByDiscIdResponse},
+                {DummyData.MuchAgainstEveryonesAdvice.MusicBrainzDiscId, DummyData.MuchAgainstEveryonesAdvice.GetReleaseByDiscIdResponse}
             };
-            _releases = new Dictionary<string, string>
-            {
-                {DummyData.SteekJeVingerInDeLucht.MusicBrainzReleaseId, DummyData.SteekJeVingerInDeLucht.GetReleaseResponse}
-            };
+            _releases = DummyData.SteekJeVingerInDeLucht.MusicBrainzReleases
+                .Concat(DummyData.MuchAgainstEveryonesAdvice.MusicBrainzReleases)
+                .ToDictionary(k => k.Key, k => k.Value);
         }
 
         public MusicBrainzResponse GetReleasesByDiscId(string discId)
