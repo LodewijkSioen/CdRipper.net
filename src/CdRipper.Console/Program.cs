@@ -84,17 +84,10 @@ namespace CdRipper.TestConsole
                     }))
                     {
                         var cts = new CancellationTokenSource();
+                        trackReader.Progress += (i, a) => Console.WriteLine("{0} of {1} read", i, a);
                         
                         var track = toc.Tracks.First(t => t.TrackNumber == trackNumber);
-                        await trackReader.ReadTrack(track.Offset, track.Sectors,
-                            b =>
-                            {
-                                encoder.Write(b);
-                            },
-                            (i, a) =>
-                            {
-                                Console.WriteLine("{0} of {1} read", i, a);
-                            }, cts.Token);
+                        await trackReader.ReadTrack(track, b => encoder.Write(b), cts.Token);
                     }
                 }
                 await drive.Eject();

@@ -19,11 +19,13 @@ namespace CdRipper.Tests.Rip
 
             using (var reader = new TrackReader(dummyDrive))
             {
+                reader.Progress += (read, bytes) => { };
+
                 reader.ReadTrack(150, 25, buffer =>
                 {
                     Assert.That(buffer, Has.All.EqualTo((byte)1));
                     bytesRead += buffer.Length;
-                }, (read, bytes) => { }, CancellationToken.None).Wait();
+                }, CancellationToken.None).Wait();
             }
 
             Assert.That(dummyDrive.StartSectors[0], Is.EqualTo(0), "We don't want the 2s lead-in when reading from the disc");
