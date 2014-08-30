@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using CdRipper.Rip;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
@@ -13,11 +14,13 @@ namespace CdRipper.Tagging
 
     public class MusicBrainzTagSource : ITagSource
     {
-        private readonly IIMusicBrainzApi _api;
+        private readonly IMusicBrainzApi _api;
+        private readonly ICoverArtArchiveApi _coverApi;
 
-        public MusicBrainzTagSource(IIMusicBrainzApi musicBrainzApi)
+        public MusicBrainzTagSource(IMusicBrainzApi musicBrainzApi, ICoverArtArchiveApi coverApi)
         {
             _api = musicBrainzApi;
+            _coverApi = coverApi;
         }
 
         public IEnumerable<AlbumIdentification> GetTags(TableOfContents toc)
@@ -33,10 +36,24 @@ namespace CdRipper.Tagging
 
             if (IsCdStub(response))
             {
-                return new []{ ParseCdStub(response)};
+                var stub = ParseCdStub(response);
+                stub.AlbumArt = GetAlbumArt(stub.Id); 
+                return new []{ stub };
             }
 
-            return ParseReleases(response, discId);
+            var releases = ParseReleases(response, discId).ToList();
+            foreach (var release in releases)
+            {
+                release.AlbumArt = GetAlbumArt(release.Id);
+            }
+
+            return releases;
+        }
+
+        public Uri GetAlbumArt(string id)
+        {
+            var response = _coverApi.GetReleasesByDiscId(id);
+            return string.IsNullOrWhiteSpace(response) ? null : new Uri(response);
         }
 
         private AlbumIdentification ParseCdStub(MusicBrainzResponse response)

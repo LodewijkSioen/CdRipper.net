@@ -3,7 +3,7 @@ using System.Net;
 
 namespace CdRipper.Tagging
 {
-    public interface IIMusicBrainzApi
+    public interface IMusicBrainzApi
     {
         MusicBrainzResponse GetReleasesByDiscId(string discId);
         MusicBrainzResponse GetRelease(string releaseId);
@@ -29,7 +29,7 @@ namespace CdRipper.Tagging
         }
     }
 
-    public class MusicBrainzApi : IIMusicBrainzApi
+    public class MusicBrainzApi : IMusicBrainzApi
     {
         private readonly Uri _serviceUri;
 
@@ -56,6 +56,7 @@ namespace CdRipper.Tagging
             {
                 try
                 {
+                    client.Headers.Add(HttpRequestHeader.UserAgent, "OpenHomeServer/0.1 (https://github.com/LodewijkSioen/OpenHomeServer)");
                     var json = client.DownloadString(requestUri);
                     return new MusicBrainzResponse(true, json);
                 }

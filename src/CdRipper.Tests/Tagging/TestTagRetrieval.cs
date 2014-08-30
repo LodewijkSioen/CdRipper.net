@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using CdRipper.Tagging;
 using NUnit.Framework;
@@ -11,7 +12,7 @@ namespace CdRipper.Tests.Tagging
         [Test]
         public void TestGettingTheDiscTags()
         {
-            var tagSource = new MusicBrainzTagSource(new MockMusicBrainzApi());
+            var tagSource = new MusicBrainzTagSource(new MockMusicBrainzApi(), new MockCoverArtApi());
 
             var discTags = tagSource.GetTags(DummyData.SteekJeVingerInDeLucht.TableOfContents).ToList();
 
@@ -34,7 +35,7 @@ namespace CdRipper.Tests.Tagging
         [Test]
         public void TestGettingTheDiscTagsForACdStub()
         {
-            var tagSource = new MusicBrainzTagSource(new MockMusicBrainzApi());
+            var tagSource = new MusicBrainzTagSource(new MockMusicBrainzApi(), new MockCoverArtApi());
 
             var discTags = tagSource.GetTags(DummyData.AppelsEten.TableOfContents).ToList();
 
@@ -59,7 +60,7 @@ namespace CdRipper.Tests.Tagging
         [Test]
         public void TestGettingAnUnknownDiscId()
         {
-            var tagSource = new MusicBrainzTagSource(new MockMusicBrainzApi());
+            var tagSource = new MusicBrainzTagSource(new MockMusicBrainzApi(), new MockCoverArtApi());
 
             var discTags = tagSource.GetTags(DummyData.UnknownCd.TableOfContents).ToList();
 
@@ -70,7 +71,7 @@ namespace CdRipper.Tests.Tagging
         [Test]
         public void TestGettingInfoForACdWithMultipleResults()
         {
-            var tagSource = new MusicBrainzTagSource(new MockMusicBrainzApi());
+            var tagSource = new MusicBrainzTagSource(new MockMusicBrainzApi(), new MockCoverArtApi());
 
             var discTags = tagSource.GetTags(DummyData.MuchAgainstEveryonesAdvice.TableOfContents).ToList();
 
@@ -81,12 +82,29 @@ namespace CdRipper.Tests.Tagging
             Assert.That(discTags.ElementAt(2).Id, Is.EqualTo("d939579c-cd40-4dd7-8927-8030f7932cbc"));
         }
 
+        [Test]
+        public void TestGetInfoForACdWithCoverArt()
+        {
+            var tagSource = new MusicBrainzTagSource(new MockMusicBrainzApi(), new MockCoverArtApi());
+
+            var discTags = tagSource.GetTags(DummyData.MuchAgainstEveryonesAdvice.TableOfContents).ToList();
+
+            foreach (var tag in discTags)
+            {
+                var expected = DummyData.MuchAgainstEveryonesAdvice.AlbumArt[tag.Id] == null
+                    ? null
+                    : new Uri(DummyData.MuchAgainstEveryonesAdvice.AlbumArt[tag.Id]);
+                Assert.That(tag.AlbumArt, Is.EqualTo(expected));
+            }
+        }
+
         private void AssertAlbum(AlbumIdentification actual, AlbumIdentification expected)
         {
             Assert.That(actual.Id, Is.EqualTo(expected.Id), "AlbumId");
-            Assert.That(actual.AlbumArtist, Is.EqualTo(actual.AlbumArtist), "AlbumArtist");
-            Assert.That(actual.AlbumTitle, Is.EqualTo(actual.AlbumTitle), "AlbumTitle");
-            Assert.That(actual.Year, Is.EqualTo(actual.Year), "Year");
+            Assert.That(actual.AlbumArtist, Is.EqualTo(expected.AlbumArtist), "AlbumArtist");
+            Assert.That(actual.AlbumTitle, Is.EqualTo(expected.AlbumTitle), "AlbumTitle");
+            Assert.That(actual.Year, Is.EqualTo(expected.Year), "Year");
+            Assert.That(actual.AlbumArt, Is.EqualTo(expected.AlbumArt));
             Assert.That(actual.NumberOfTracks, Is.EqualTo(expected.NumberOfTracks), "NumberOfTracks");
             Assert.That(actual.Tracks.Count(), Is.EqualTo(expected.Tracks.Count()), "Count of tracks on the album");
             for (int i = 0; i < expected.Tracks.Count(); i++)
@@ -115,6 +133,7 @@ namespace CdRipper.Tests.Tagging
         {
             var cd = DummyData.MuchAgainstEveryonesAdvice;
             var api = new MusicBrainzApi("http://musicbrainz.org/");
+            var coverApi = new CoverArtArchiveApi("http://coverartarchive.org");
 
             var discIdResponse = api.GetReleasesByDiscId(MusicBrainzDiscIdCalculator.CalculateDiscId(cd.TableOfContents));
             Assert.That(discIdResponse.Json, Is.EqualTo(cd.GetReleaseByDiscIdResponse), discIdResponse.Json.Replace(@"""", @"\"""));
@@ -127,10 +146,18 @@ namespace CdRipper.Tests.Tagging
                     Assert.That(releaseResponse.Json, Is.EqualTo(release.Value), releaseResponse.Json.Replace(@"""", @"\"""));
                 }
             }
+            if (cd.AlbumArt != null)
+            {
+                foreach (var art in cd.AlbumArt)
+                {
+                    var cover = coverApi.GetReleasesByDiscId(art.Key);
+                    Assert.That(cover, Is.EqualTo(art.Value), cover);
+                }
+            }
         }
     }
 
-    public class MockMusicBrainzApi : IIMusicBrainzApi
+    public class MockMusicBrainzApi : IMusicBrainzApi
     {
         private readonly Dictionary<string, string> _releasesForDiscId;
         private readonly Dictionary<string, string> _releases;
@@ -156,6 +183,21 @@ namespace CdRipper.Tests.Tagging
         public MusicBrainzResponse GetRelease(string releaseId)
         {
             return new MusicBrainzResponse(true, _releases[releaseId]);
+        }
+    }
+
+    public class MockCoverArtApi : ICoverArtArchiveApi
+    {
+        private readonly Dictionary<string, string> _coverArt;
+
+        public MockCoverArtApi()
+        {
+            _coverArt = DummyData.MuchAgainstEveryonesAdvice.AlbumArt;
+        }
+
+        public string GetReleasesByDiscId(string discId)
+        {
+            return _coverArt.ContainsKey(discId) ? _coverArt[discId] : null;
         }
     }
 }

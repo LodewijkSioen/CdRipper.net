@@ -3,15 +3,13 @@ using System.Threading.Tasks;
 using CdRipper.Encode;
 using CdRipper.Rip;
 using System;
-using System.IO;
 using System.Linq;
 using CdRipper.Tagging;
 namespace CdRipper.TestConsole
 {
     class Program
     {
-       static readonly MusicBrainzTagSource TagSource = new MusicBrainzTagSource(new MusicBrainzApi("http://musicbrainz.org/"));
-
+        static readonly MusicBrainzTagSource TagSource = new MusicBrainzTagSource(new MusicBrainzApi("http://musicbrainz.org/"), new CoverArtArchiveApi("http://coverartarchive.org/"));
 
         static void Main(string[] args)
         {

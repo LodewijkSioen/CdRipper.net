@@ -47,6 +47,7 @@
     <Compile Include="Encode\LameArgumentBuilder.cs" />
     <Compile Include="Encode\OutputLocation.cs" />
     <Compile Include="Tagging\AlbumIdentification.cs" />
+    <Compile Include="Tagging\CoverArtArchiveApi.cs" />
     <Compile Include="Tagging\MusicBrainzApi.cs" />
     <Compile Include="Tagging\MusicBrainzDiscIdCalculator.cs" />
     <Compile Include="Tagging\FreeDbDiscIdCalculator.cs" />

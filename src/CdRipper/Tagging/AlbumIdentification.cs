@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -18,6 +19,7 @@ namespace CdRipper.Tagging
         public string AlbumTitle { get; set; }
         public int NumberOfTracks { get; set; }
         public string Year { get; set; }
+        public Uri AlbumArt { get; set; }
 
         public void AddTrack(TrackIdentification track)
         {
