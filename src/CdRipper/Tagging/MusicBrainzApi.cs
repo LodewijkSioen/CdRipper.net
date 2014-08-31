@@ -56,7 +56,7 @@ namespace CdRipper.Tagging
             {
                 try
                 {
-                    client.Headers.Add(HttpRequestHeader.UserAgent, "OpenHomeServer/0.1 (https://github.com/LodewijkSioen/OpenHomeServer)");
+                    client.Headers.Add(HttpRequestHeader.UserAgent, Constants.UserAgent);
                     var json = client.DownloadString(requestUri);
                     return new MusicBrainzResponse(true, json);
                 }
