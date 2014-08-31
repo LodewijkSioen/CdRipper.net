@@ -41,7 +41,7 @@ namespace CdRipper.Encode
             AddSwitch(builder, "--tl", _track.AlbumTitle);
             AddSwitch(builder, "--ty", _track.Year);
             AddExtraId3Tag(builder, "TPE2", _track.AlbumArtist); //http://stackoverflow.com/a/5958664/66842
-            //AddSwitch("--ti", track.Disc.AlbumArtLocation);
+            AddSwitch(builder, "--ti", _track.AlbumArt.ToString());
             AddTrackNumber(builder, _track);
             return builder;
         }

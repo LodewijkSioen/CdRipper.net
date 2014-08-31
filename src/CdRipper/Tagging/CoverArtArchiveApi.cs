@@ -22,6 +22,7 @@ namespace CdRipper.Tagging
             var requestUri = new Uri(_serviceUri, string.Format("/release/{0}/front", discId));
 
             var request = (HttpWebRequest)WebRequest.Create(requestUri);
+            request.UserAgent = "OpenHomeServer/0.1 (https://github.com/LodewijkSioen/OpenHomeServer)";
             request.AllowAutoRedirect = false;
             try
             {

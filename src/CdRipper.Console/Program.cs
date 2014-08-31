@@ -25,6 +25,12 @@ namespace CdRipper.TestConsole
                 catch (Exception e)
                 {
                     Console.WriteLine(e.Message);
+                    var inner = e.InnerException;
+                    while(inner != null)
+                    {
+                        Console.WriteLine(inner.Message);
+                        inner = inner.InnerException;
+                    }
                 }
             }            
         }
@@ -54,7 +60,7 @@ namespace CdRipper.TestConsole
                     Console.WriteLine("Multiple matching CD's found in MusicBrainz");
                     for (int i = 0; i < discId.Count; i++)
                     {
-                        Console.WriteLine("{0}: {1} - {2}", i+1, discId[i].AlbumArtist, discId[i].AlbumTitle);
+                        Console.WriteLine("{0}: {1} - {2} (Coverart: {3})", i+1, discId[i].AlbumArtist, discId[i].AlbumTitle, discId[i].AlbumArt == null ? "no" : "yes");
                     }
                     Console.WriteLine("Enter the number of the correct cd");
                     discNumber = Convert.ToInt32(Console.ReadLine()) -1;

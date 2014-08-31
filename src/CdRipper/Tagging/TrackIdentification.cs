@@ -1,4 +1,5 @@
-﻿namespace CdRipper.Tagging
+﻿using System;
+namespace CdRipper.Tagging
 {
     public class TrackIdentification
     {
@@ -18,6 +19,7 @@
         public string AlbumTitle { get { return _album.AlbumTitle; } }
         public string Year { get { return _album.Year; } }
         public int TotalNumberOfTracks { get { return _album.NumberOfTracks; } }
+        public Uri AlbumArt { get { return _album.AlbumArt; } }
 
         internal void SetAlbum(AlbumIdentification album)
         {
