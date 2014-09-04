@@ -78,11 +78,9 @@ namespace CdRipper.TestConsole
                 {
                     using (var encoder = new LameMp3Encoder(new EncoderSettings
                     {
-                        Output = new OutputLocation
-                        {
-                            BaseDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
-                            FileNameMask = @"encoding\{albumartist}\{albumtitle}\{tracknumber}-{title}.mp3"
-                        },
+                        Output = new OutputLocationBuilder(
+                            Environment.GetFolderPath(Environment.SpecialFolder.Desktop), 
+                            @"encoding\{albumartist}\{albumtitle}\{tracknumber}-{title}.mp3"),
                         Mp3Settings = new Mp3Settings(),
                         Track = discId[discNumber].Tracks.First(s => s.TrackNumber == trackNumber)
                     }))

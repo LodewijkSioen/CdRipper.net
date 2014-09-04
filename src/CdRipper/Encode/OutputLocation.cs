@@ -4,25 +4,67 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using CdRipper.Tagging;
+using System.Net;
 
 namespace CdRipper.Encode
 {
-    public class OutputLocation
+    public class OutputLocationBuilder
     {
         private IEnumerable<char> _illegalPathCharacters;
 
-        public OutputLocation()
+        public OutputLocationBuilder(string baseDirectory = null, string fileNameMask = null)
         {
-            BaseDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic);
-            FileNameMask = "{albumartist}\\{albumtitle}\\{tracknumber}-{title}.m3";
+            BaseDirectory = baseDirectory ?? Environment.GetFolderPath(Environment.SpecialFolder.MyMusic);
+            FileNameMask = fileNameMask ?? "{albumartist}\\{albumtitle}\\{tracknumber}-{title}.m3";
 
             _illegalPathCharacters = Path.GetInvalidFileNameChars().Where(c => c != '\\');
         }
 
-        public string BaseDirectory { get; set; }
-        public string FileNameMask { get; set; }
+        public string BaseDirectory { get; private set; }
+        public string FileNameMask { get; private set; }
 
-        public string CreateFileName(TrackIdentification track)
+        public OutputLocation PrepareOutput(TrackIdentification track)
+        {
+            var fileName = CreateFileName(track);
+            var directory = CreateDirectory(fileName);
+            var coverFile = CreateCoverFile(directory, track);
+
+            return new OutputLocation(fileName, coverFile);
+        }
+
+        private string CreateCoverFile(DirectoryInfo directory, TrackIdentification track)
+        {
+            if (track.AlbumArt == null)
+            {
+                return null;
+            }
+
+            var coverFile = Path.Combine(directory.ToString(), "cover.jpg");
+
+            if (File.Exists(coverFile))
+            {
+                return coverFile;
+            }
+
+            using (var client = new WebClient())
+            {
+                client.DownloadFile(track.AlbumArt, coverFile);
+            }
+            
+            return coverFile;
+        }
+
+        private DirectoryInfo CreateDirectory(string fileName)
+        {
+            var directory = new DirectoryInfo(Path.GetDirectoryName(fileName));
+            if (!directory.Exists)
+            {
+                directory.Create();
+            }
+            return directory;
+        }
+        
+        private string CreateFileName(TrackIdentification track)
         {
             var replacements = new Dictionary<string, string>
             {
@@ -35,6 +77,7 @@ namespace CdRipper.Encode
                 {"{albumtitle}", track.AlbumTitle},
                 {"{year}", track.Year}
             };
+
             foreach (var character in Path.GetInvalidFileNameChars())
             {
                 if (character != Path.DirectorySeparatorChar && character != Path.AltDirectorySeparatorChar)
@@ -48,11 +91,11 @@ namespace CdRipper.Encode
             return Path.Combine(BaseDirectory, fileName);
         }
 
-        public static OutputLocation Default
+        public static OutputLocationBuilder Default
         {
             get
             {
-                return new OutputLocation();
+                return new OutputLocationBuilder();
             }
         }
 
@@ -61,5 +104,17 @@ namespace CdRipper.Encode
             return replaceValues.Aggregate(input, (current, replaceValue) => 
                 Regex.Replace(current, Regex.Escape(replaceValue.Key), replaceValue.Value ?? string.Empty, RegexOptions.IgnoreCase));
         }
+    }
+
+    public class OutputLocation
+    {
+        public OutputLocation(string fileName, string coverFile)
+        {
+            FileName = fileName;
+            CoverFile = coverFile;
+        }
+
+        public string FileName { get; private set; }
+        public string CoverFile { get; private set; }
     }
 }

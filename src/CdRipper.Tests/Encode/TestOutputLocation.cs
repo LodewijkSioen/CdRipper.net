@@ -11,11 +11,7 @@ namespace CdRipper.Tests.Encode
         [Test]
         public void TestReplaceTokens()
         {
-            var output = new OutputLocation
-            {
-                BaseDirectory = @"c:\test",
-                FileNameMask = @"track\{title}\{artist}-{tracknumber}\{genre}-{albumtitle}.{albumartist}-{numberoftracks}-{year}.mp3"
-            };
+            var output = new OutputLocationBuilder(@"c:\test", @"track\{title}\{artist}-{tracknumber}\{genre}-{albumtitle}.{albumartist}-{numberoftracks}-{year}.mp3");
 
             var album = new AlbumIdentification
             {
@@ -32,43 +28,35 @@ namespace CdRipper.Tests.Encode
                 Genre = "genre",
             });
 
-            var filename = output.CreateFileName(album.Tracks.First());
+            var filename = output.PrepareOutput(album.Tracks.First());
 
-            Assert.That(filename, Is.EqualTo(@"c:\test\track\title\artist-04\genre-album title.album artist-25-1854.mp3"));
+            Assert.That(filename.FileName, Is.EqualTo(@"c:\test\track\title\artist-04\genre-album title.album artist-25-1854.mp3"));
         }
 
         [Test]
         public void TestReplaceNullTokens()
         {
-            var output = new OutputLocation
-            {
-                BaseDirectory = @"c:\test",
-                FileNameMask = "track-{title}-{albumtitle}.mp3"
-            };
+            var output = new OutputLocationBuilder(@"c:\test", "track-{title}-{albumtitle}.mp3");
 
             var album = new AlbumIdentification();
             album.AddTrack(new TrackIdentification());
 
-            var filename = output.CreateFileName(album.Tracks.First());
+            var filename = output.PrepareOutput(album.Tracks.First());
 
-            Assert.That(filename, Is.EqualTo(@"c:\test\track--.mp3"));
+            Assert.That(filename.FileName, Is.EqualTo(@"c:\test\track--.mp3"));
         }
 
         [Test]
         public void TestIllegalCharactersInFileName()
         {
-            var output = new OutputLocation
-            {
-                BaseDirectory = @"c:\test",
-                FileNameMask = @"tr*??//
-ack.mp3"
-            };
+            var output = new OutputLocationBuilder(@"c:\test", @"tr*??//
+ack.mp3");
 
             
             var track = new TrackIdentification();
-            var filename = output.CreateFileName(track);
+            var filename = output.PrepareOutput(track);
 
-            Assert.That(filename, Is.EqualTo(@"c:\test\tr//ack.mp3"));
+            Assert.That(filename.FileName, Is.EqualTo(@"c:\test\tr//ack.mp3"));
 
         }
     }

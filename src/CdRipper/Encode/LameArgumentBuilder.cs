@@ -8,7 +8,7 @@ namespace CdRipper.Encode
 {
     public class LameArgumentBuilder
     {
-        private readonly OutputLocation _outputLocation;
+        private readonly OutputLocation _trackLocation;
         private readonly Mp3Settings _mp3Settings;
         private readonly TrackIdentification _track;
 
@@ -16,7 +16,7 @@ namespace CdRipper.Encode
         {
             _track = settings.Track ?? AlbumIdentification.GetEmpty(1).Tracks.First();
             _mp3Settings = settings.Mp3Settings ?? Mp3Settings.Default;
-            _outputLocation = settings.Output ?? OutputLocation.Default;
+            _trackLocation = settings.Output.PrepareOutput(_track) ?? OutputLocationBuilder.Default.PrepareOutput(_track);
         }
 
         public override string ToString()
@@ -43,16 +43,7 @@ namespace CdRipper.Encode
             AddSwitch(builder, "--tl", _track.AlbumTitle);
             AddSwitch(builder, "--ty", _track.Year);
             AddExtraId3Tag(builder, "TPE2", _track.AlbumArtist); //http://stackoverflow.com/a/5958664/66842
-            if (_track.AlbumArt != null)
-            {
-                var folder = Path.GetDirectoryName(_outputLocation.CreateFileName(_track));
-                var coverFile = Path.Combine(folder, "cover.jpg");
-                using (var client = new WebClient())
-                {
-                    client.DownloadFile(_track.AlbumArt, coverFile);
-                }
-                AddSwitch(builder, "--ti", coverFile);
-            }
+            AddSwitch(builder, "--ti", _trackLocation.CoverFile);
             AddTrackNumber(builder, _track);
             return builder;
         }
@@ -69,10 +60,8 @@ namespace CdRipper.Encode
 
         private StringBuilder BuildEndArguments(StringBuilder builder)
         {
-            var fileName = _outputLocation.CreateFileName(_track);
-
             builder.Append("- "); //input is stin
-            builder.AppendFormat("\"{0}\"", fileName);
+            builder.AppendFormat("\"{0}\"", _trackLocation.FileName);
             return builder;
         }
 
