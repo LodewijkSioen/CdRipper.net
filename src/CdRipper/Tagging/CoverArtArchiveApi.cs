@@ -5,7 +5,7 @@ namespace CdRipper.Tagging
 {
     public interface ICoverArtArchiveApi
     {
-        string GetReleasesByDiscId(string discId);
+        ApiRespose GetReleasesByDiscId(string discId);
     }
 
     public class CoverArtArchiveApi : ICoverArtArchiveApi
@@ -17,21 +17,30 @@ namespace CdRipper.Tagging
             _serviceUri = new Uri(serviceUrl);
         }
 
-        public string GetReleasesByDiscId(string discId)
+        public ApiRespose GetReleasesByDiscId(string discId)
         {
-            var requestUri = new Uri(_serviceUri, string.Format("/release/{0}/front", discId));
+            var requestUri = new Uri(_serviceUri, string.Format("/release/{0}", discId));
 
-            var request = (HttpWebRequest)WebRequest.Create(requestUri);
-            request.UserAgent = Constants.UserAgent;
-            request.AllowAutoRedirect = false;
-            try
+            using (var client = new WebClient())
             {
-                var response = (HttpWebResponse) request.GetResponse();
-                return response.StatusCode == HttpStatusCode.RedirectKeepVerb ? response.Headers["Location"] : null;
-            }
-            catch (WebException ex)
-            {
-                return null;
+                try
+                {
+                    client.Headers.Add(HttpRequestHeader.UserAgent, Constants.UserAgent);
+                    var json = client.DownloadString(requestUri);
+                    return new ApiRespose(true, json);
+                }
+                catch (WebException webEx)
+                {
+                    if (webEx.Response as HttpWebResponse != null)
+                    {
+                        var response = ((HttpWebResponse)webEx.Response);
+                        if (response.StatusCode == HttpStatusCode.NotFound)
+                        {
+                            return new ApiRespose(false, null);
+                        }
+                    }
+                    throw;
+                }
             }
         }
     }

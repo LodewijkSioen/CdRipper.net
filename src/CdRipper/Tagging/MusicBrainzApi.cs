@@ -5,28 +5,8 @@ namespace CdRipper.Tagging
 {
     public interface IMusicBrainzApi
     {
-        MusicBrainzResponse GetReleasesByDiscId(string discId);
-        MusicBrainzResponse GetRelease(string releaseId);
-    }
-
-    public class MusicBrainzResponse
-    {
-        public bool IsFound { get; private set; }
-        public string Json { get; private set; }
-
-        public MusicBrainzResponse(bool isFound, string json)
-        {
-            Json = json;
-            IsFound = isFound;
-        }
-
-        public override bool Equals(object obj)
-        {
-            var other = obj as MusicBrainzResponse;
-            if (other == null) return false;
-
-            return other.IsFound == this.IsFound && other.Json == this.Json;
-        }
+        ApiRespose GetReleasesByDiscId(string discId);
+        ApiRespose GetRelease(string releaseId);
     }
 
     public class MusicBrainzApi : IMusicBrainzApi
@@ -38,19 +18,19 @@ namespace CdRipper.Tagging
             _serviceUri = new Uri(new Uri(serviceUrl), "ws/2/");
         }
 
-        public MusicBrainzResponse GetReleasesByDiscId(string discId)
+        public ApiRespose GetReleasesByDiscId(string discId)
         {
             var requestUri = new Uri(_serviceUri, string.Format("discid/{0}?fmt=json", discId));
             return GetResponseFromMusicBrainz(requestUri);
         }
 
-        public MusicBrainzResponse GetRelease(string releaseId)
+        public ApiRespose GetRelease(string releaseId)
         {
             var requestUri = new Uri(_serviceUri, string.Format("release/{0}?inc=artist-credits+labels+discids+recordings&fmt=json", releaseId));
             return GetResponseFromMusicBrainz(requestUri);
         }
 
-        private static MusicBrainzResponse GetResponseFromMusicBrainz(Uri requestUri)
+        private static ApiRespose GetResponseFromMusicBrainz(Uri requestUri)
         {
             using (var client = new WebClient())
             {
@@ -58,7 +38,7 @@ namespace CdRipper.Tagging
                 {
                     client.Headers.Add(HttpRequestHeader.UserAgent, Constants.UserAgent);
                     var json = client.DownloadString(requestUri);
-                    return new MusicBrainzResponse(true, json);
+                    return new ApiRespose(true, json);
                 }
                 catch (WebException webEx)
                 {
@@ -67,7 +47,7 @@ namespace CdRipper.Tagging
                         var response = ((HttpWebResponse) webEx.Response);
                         if (response.StatusCode == HttpStatusCode.NotFound)
                         {
-                            return new MusicBrainzResponse(false, null);
+                            return new ApiRespose(false, null);
                         }
                     }
                     throw;

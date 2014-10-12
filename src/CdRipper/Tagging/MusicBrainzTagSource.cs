@@ -53,10 +53,20 @@ namespace CdRipper.Tagging
         public Uri GetAlbumArt(string id)
         {
             var response = _coverApi.GetReleasesByDiscId(id);
-            return string.IsNullOrWhiteSpace(response) ? null : new Uri(response);
+            return response.IsFound ? ParseAlbumArt(response) : null;
         }
 
-        private AlbumIdentification ParseCdStub(MusicBrainzResponse response)
+        private Uri ParseAlbumArt(ApiRespose response)
+        {
+            var art = JObject.Parse(response.Json);
+            var imageUrl = (from image in art["images"]
+                            where image.Value<bool>("front")
+                            select image.Value<string>("image")).FirstOrDefault();
+
+            return imageUrl == null ? null : new Uri(imageUrl);
+        }
+
+        private AlbumIdentification ParseCdStub(ApiRespose response)
         {
             var stub = JObject.Parse(response.Json);
 
@@ -82,7 +92,7 @@ namespace CdRipper.Tagging
             return tag;
         }
 
-        private IEnumerable<AlbumIdentification> ParseReleases(MusicBrainzResponse response, string discId)
+        private IEnumerable<AlbumIdentification> ParseReleases(ApiRespose response, string discId)
         {
             foreach (var r in JObject.Parse(response.Json)["releases"])
             {
@@ -119,7 +129,7 @@ namespace CdRipper.Tagging
             }
         }
 
-        private bool IsCdStub(MusicBrainzResponse response)
+        private bool IsCdStub(ApiRespose response)
         {
             return !response.Json.Contains("releases");
         }

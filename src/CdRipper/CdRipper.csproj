@@ -60,6 +60,7 @@
     <Compile Include="Rip\TableOfContents.cs" />
     <Compile Include="Rip\Track.cs" />
     <Compile Include="Rip\TrackReader.cs" />
+    <Compile Include="Tagging\ApiRespose.cs" />
     <Compile Include="Tagging\MusicBrainzTagSource.cs" />
     <Compile Include="Tagging\TrackIdentification.cs" />
     <Compile Include="Win32Functions.cs" />

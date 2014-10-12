@@ -91,10 +91,7 @@ namespace CdRipper.Tests.Tagging
 
             foreach (var tag in discTags)
             {
-                var expected = DummyData.MuchAgainstEveryonesAdvice.AlbumArt[tag.Id] == null
-                    ? null
-                    : new Uri(DummyData.MuchAgainstEveryonesAdvice.AlbumArt[tag.Id]);
-                Assert.That(tag.AlbumArt, Is.EqualTo(expected));
+                Assert.That(tag.AlbumArt, Is.EqualTo(DummyData.MuchAgainstEveryonesAdvice.AlbumArt[tag.Id]));
             }
         }
 
@@ -146,12 +143,12 @@ namespace CdRipper.Tests.Tagging
                     Assert.That(releaseResponse.Json, Is.EqualTo(release.Value), releaseResponse.Json.Replace(@"""", @"\"""));
                 }
             }
-            if (cd.AlbumArt != null)
+            if (cd.AlbumArtResponse != null)
             {
-                foreach (var art in cd.AlbumArt)
+                foreach (var art in cd.AlbumArtResponse)
                 {
                     var cover = coverApi.GetReleasesByDiscId(art.Key);
-                    Assert.That(cover, Is.EqualTo(art.Value), cover);
+                    Assert.That(cover.Json, Is.EqualTo(art.Value), cover.Json);
                 }
             }
         }
@@ -175,14 +172,14 @@ namespace CdRipper.Tests.Tagging
                 .ToDictionary(k => k.Key, k => k.Value);
         }
 
-        public MusicBrainzResponse GetReleasesByDiscId(string discId)
+        public ApiRespose GetReleasesByDiscId(string discId)
         {
-            return _releasesForDiscId.ContainsKey(discId) ? new MusicBrainzResponse(true, _releasesForDiscId[discId]) : new MusicBrainzResponse(false, null);
+            return _releasesForDiscId.ContainsKey(discId) ? new ApiRespose(true, _releasesForDiscId[discId]) : new ApiRespose(false, null);
         }
 
-        public MusicBrainzResponse GetRelease(string releaseId)
+        public ApiRespose GetRelease(string releaseId)
         {
-            return new MusicBrainzResponse(true, _releases[releaseId]);
+            return new ApiRespose(true, _releases[releaseId]);
         }
     }
 
@@ -192,12 +189,12 @@ namespace CdRipper.Tests.Tagging
 
         public MockCoverArtApi()
         {
-            _coverArt = DummyData.MuchAgainstEveryonesAdvice.AlbumArt;
+            _coverArt = DummyData.MuchAgainstEveryonesAdvice.AlbumArtResponse;
         }
 
-        public string GetReleasesByDiscId(string discId)
+        public ApiRespose GetReleasesByDiscId(string discId)
         {
-            return _coverArt.ContainsKey(discId) ? _coverArt[discId] : null;
+            return _coverArt.ContainsKey(discId) ? new ApiRespose(true, _coverArt[discId]) : new ApiRespose(false, null);
         }
     }
 }
